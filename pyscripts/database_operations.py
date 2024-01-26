@@ -46,7 +46,7 @@ class DBHandler:
             return None
 
     def execute_sql_files(self, conn):
-        sql_folder = "sql"
+        sql_folder = "table_schema"
         sql_files = [file for file in os.listdir(sql_folder) if file.endswith('.sql')]
 
         if not sql_files:

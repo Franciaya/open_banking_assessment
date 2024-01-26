@@ -1,3 +1,5 @@
+/*
+
 CREATE TABLE IF NOT EXISTS transactions (
                 customer_id VARCHAR(255),
                 transaction_id VARCHAR(255),
@@ -11,3 +13,5 @@ CREATE TABLE IF NOT EXISTS transactions (
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (customer_id, transaction_id)
 );
+
+*/
