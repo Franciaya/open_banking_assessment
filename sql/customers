@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS customers (
+                customer_id VARCHAR(255),
+                last_transaction_date DATE,
+                audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (customer_id)
+);
