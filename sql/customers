@@ -1,3 +1,4 @@
+-- Active: 1706284193025@@127.0.0.1@5432@postgres
 CREATE TABLE IF NOT EXISTS customers (
                 customer_id VARCHAR(255),
                 last_transaction_date DATE,
