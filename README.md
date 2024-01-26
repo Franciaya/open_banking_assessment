@@ -31,4 +31,4 @@ scripts/: Includes Python scripts for database operations and data processing.
 sql/: Contains SQL files for database operations.
 tests/: Holds unit tests for the data processing logic.
 .gitignore: Specifies files and directories to be ignored by Git.
-README.md: Project documentation.
+README.md: Documentation and Requirement
