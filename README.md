@@ -26,9 +26,9 @@ The directory structure is organized as follows:
               |-- README.md
               |-- requirements.txt
               
-config/: Contains configuration files.
-scripts/: Includes Python scripts for database operations and data processing.
-sql/: Contains SQL files for database operations.
-tests/: Holds unit tests for the data processing logic.
-.gitignore: Specifies files and directories to be ignored by Git.
+config/: Contains configuration files.<br>
+scripts/: Includes Python scripts for database operations and data processing.<br>
+sql/: Contains SQL files for database operations.<br>
+tests/: Holds unit tests for the data processing logic.<br>
+.gitignore: Specifies files and directories to be ignored by Git.<br>
 README.md: Documentation and Requirement
