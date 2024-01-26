@@ -1,5 +1,5 @@
 # Project Summary
-Building a data pipeline for processing dummy source data in JSON format, which simulates Open Banking transaction data, is the focus of this project. The workload involves conducting a few Data Quality checks on the incoming data before transforming and inserting it into two PostgreSQL tables.
+Building a roburst and maintainable data pipeline for processing dummy source data in JSON format, which simulates Open Banking transaction data, is the focus of this project. The workload involves conducting a few Data Quality checks on the incoming data before transforming and inserting it into two PostgreSQL tables.
 
 #  Data Pipeline Overview
 The project implements the data pipeline using AWS Glue to process Open Banking transaction data provided in JSON format. The pipeline performs several data quality checks on the incoming data to ensure its integrity and validity. It validates the currency against a predefined list (EUR, GBP, USD) and checks for valid transaction dates in the 'YYYY-MM-DD' format. Additionally, the pipeline detects and handles duplicate transaction records based on customerId and transactionId.
