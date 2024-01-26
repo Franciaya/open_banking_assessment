@@ -1,4 +1,10 @@
 /*
+CREATE TABLE IF NOT EXISTS customers (
+                customer_id VARCHAR(255),
+                last_transaction_date DATE,
+                audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (customer_id)
+);
 
 CREATE TABLE IF NOT EXISTS transactions (
                 customer_id VARCHAR(255),
@@ -12,6 +18,14 @@ CREATE TABLE IF NOT EXISTS transactions (
                 currency VARCHAR(3),
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (customer_id, transaction_id)
+                FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+CREATE TABLE IF NOT EXISTS error_log_tab (
+                customer_id VARCHAR(255),
+                transaction_id VARCHAR(255),
+                error_message VARCHAR(255),
+                audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 */
