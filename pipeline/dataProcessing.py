@@ -3,10 +3,10 @@ import os
 import psycopg2
 from datetime import datetime
 from psycopg2 import sql
+from currencyValidator import AllowedCurrencyValidator
+from PostgreSQLCreateSchema import DBHandler
 
 class DataProcessor:
-    def __init__(self, db_config):
-        self.db_config = db_config
 
     def process_data(self, data):
         transformed_data = []
@@ -59,7 +59,8 @@ class DataProcessor:
         return transformed_record, None
 
     def load_data_into_tables(self, data, table_name):
-        conn = psycopg2.connect(**self.db_config)
+        db = DBHandler(config_file=r'D:\open_banking_assessment\config.ini',section='DATABASE')
+        conn = db.connect_to_database()
         with conn.cursor() as cursor:
             for record in data:
                 columns = record.keys()
