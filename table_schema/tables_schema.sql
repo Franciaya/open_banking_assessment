@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS customers (
 
 CREATE TABLE IF NOT EXISTS transactions (
                 customer_id VARCHAR(255) NOT NULL,
+                customer_name VARCHAR(255),
                 transaction_id VARCHAR(255) NOT NULL,
                 transaction_date DATE,
                 source_date TIMESTAMP,

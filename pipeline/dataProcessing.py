@@ -28,30 +28,37 @@ class DataProcessor:
         return transformed_data, error_data
 
     def _process_record(self, record):
-        if record['currency'] not in ['EUR', 'GBP', 'USD']:
+        allowedCur = AllowedCurrencyValidator()
+        if not allowedCur.validate(record['currency']):
             return None, {
                 'customer_id': record['customerId'],
                 'transaction_id': record['transactionId'],
                 'error_message': 'Invalid currency'
-            }
+            }   
 
         try:
+            # Convert to the data types before data mapping into PostgeSQL table schema
             transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d').date()
-        except ValueError:
+            parsed_date = datetime.strptime(record['sourceDate'], "%Y-%m-%dT%H:%M:%S")
+            source_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+            amount = float(record['amount'])
+
+        except ValueError as e:
             return None, {
                 'customer_id': record['customerId'],
                 'transaction_id': record['transactionId'],
-                'error_message': 'Invalid transactionDate'
+                'error_message': str(f'Invalid format: {e}')
             }
 
         transformed_record = {
             'customer_id': record['customerId'],
+            'customer_name': record['customerName'],
             'transaction_id': record['transactionId'],
             'transaction_date': transaction_date,
-            'source_date': record['sourceDate'],
+            'source_date': source_date,
             'merchant_id': record['merchantId'],
             'category_id': record['categoryId'],
-            'amount': record['amount'],
+            'amount': amount,
             'description': record['description'],
             'currency': record['currency']
         }
