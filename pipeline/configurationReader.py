@@ -52,4 +52,8 @@ class ConfigReader:
 
 # # Retrieve a specific value from the specified section
 # db_host = config_reader.get_value(section_name, 'host')
-# print("Database Host:", db_host)       
+# print("Database Host:", db_host) 
+
+# allowedList = config_reader.get_section('allowed_currencies')
+# print("Allowed currency dictionary: ", {col.upper():v for col,v in allowedList.items()})
+# print("Allowed currency list:", [s.upper() for s in list(allowedList)])
