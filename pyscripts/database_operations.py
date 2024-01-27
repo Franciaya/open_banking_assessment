@@ -16,7 +16,7 @@ class DBHandler:
         self.config_file = config_file
         self.section = section
 
-    def read_config(self):
+    def readDB_config(self):
         """
         Read database connection details from the configuration file.
 
@@ -37,7 +37,7 @@ class DBHandler:
 
     def connect_to_database(self):
         try:
-            db_params = self.read_config()
+            db_params = self.readDB_config()
             conn = psycopg2.connect(**db_params)
             print("Connected to the database")
             return conn
