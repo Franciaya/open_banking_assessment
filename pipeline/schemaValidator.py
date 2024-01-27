@@ -1,20 +1,20 @@
 from configparser import ConfigParser
+import os
+from configurationReader import ConfigReader
 
 class SchemaValidator:
-    def __init__(self, section:str ,config_file='config.ini'):
-        self.schema = self.read_config(section, config_file)
+    def __init__(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(script_dir, '..', 'config', 'config.ini')
+        reader = ConfigReader(config_file_path)
+        self.schema = reader.get_section('transactions_table_schema')
 
-    def read_config(self, section, config_file):
-        parser = ConfigParser()
-        parser.read(config_file)
-
-        params = {}
-        if parser.has_section(section):
-            params = dict(parser.items(section))
+    def readSchema_config(self):
+        
+        if self.schema:
+            return self.schema
         else:
-            raise Exception(f'Section {section} not found in the {config_file} file')
-
-        return params
+            return {}
 
     def validate(self, record):
         for column, datatype in self.schema.items():
