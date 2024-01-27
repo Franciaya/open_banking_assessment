@@ -40,23 +40,24 @@ class JSONDuplicateRemover:
         with open(filename, 'w') as file:
             json.dump(data, file, indent=4)
 
-    def remove_duplicates(self, json_filename, output_filename):
-        """Removes duplicates from JSON file based on configuration."""
-        config = self.readJSON_config()
-        transaction_key = config.get('transactions_key')
-        composite_keys = config.get('composite_keys').split(',')
-        source_date_key = config.get('source_date_key')
 
-        data = self.load_json(json_filename)
-        filtered_data = self.filter_duplicates(data, transaction_key, composite_keys, source_date_key)
-        self.save_json(filtered_data, output_filename)
-        print("Duplicates removed and filtered data saved to", output_filename)
+# Usage of JSONDuplicate Removal
+def remove_duplicates(json_filename, output_filename):
+    """Removes duplicates from JSON file based on configuration."""
 
-if __name__ == "__main__":
     config_file_path = r'C:\path\to\your\config.ini'
     section_name = 'your_section_name'
-    json_file_path = r'C:\path\to\your\data.json'
-    output_file_path = r'C:\path\to\your\filtered_data.json'
+    #json_file_path = r'C:\path\to\your\data.json'
+    #output_file_path = r'C:\path\to\your\filtered_data.json'
 
-    remover = JSONDuplicateRemover(config_file_path, section_name)
-    remover.remove_duplicates(json_file_path, output_file_path)
+    rem = JSONDuplicateRemover(config_file_path, section_name)
+
+    config = rem.readJSON_config()
+    transaction_key = config.get('transactions_key')
+    composite_keys = config.get('composite_keys').split(',')
+    source_date_key = config.get('source_date_key')
+
+    data = rem.load_json(json_filename)
+    filtered_data = rem.filter_duplicates(data, transaction_key, composite_keys, source_date_key)
+    rem.save_json(filtered_data, output_filename)
+    print("Duplicates removed and filtered data saved to", output_filename)
