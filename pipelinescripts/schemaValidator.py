@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 
-class TransactionsValidator:
+class SchemaValidator:
     def __init__(self, section:str ,config_file='config.ini'):
         self.schema = self.read_config(section, config_file)
 
