@@ -5,6 +5,8 @@ from datetime import datetime
 from psycopg2 import sql
 from currencyValidator import AllowedCurrencyValidator
 from PostgreSQLCreateSchema import DBHandler
+from configurationReader import ConfigReader
+from schemaValidator import SchemaValidator
 
 class DataProcessor:
 
@@ -22,7 +24,7 @@ class DataProcessor:
                 error_data.append({
                     'customer_id': record.get('customerId'),
                     'transaction_id': record.get('transactionId'),
-                    'error_message': str(e)
+                    'error_message': str(f'Error in processing data due to: {e}')
                 })
 
         return transformed_data, error_data
@@ -62,9 +64,26 @@ class DataProcessor:
             'description': record['description'],
             'currency': record['currency']
         }
+        # DQ checks, schema validation 
+        flag, err_msg = self._check_schema(transformed_record)
 
+        if not flag:
+            return None, {
+                'customer_id': record['customerId'],
+                'transaction_id': record['transactionId'],
+                'error_message': err_msg
+            }
+        
         return transformed_record, None
+    
+    def _check_schema(self,record):
 
+        schema = SchemaValidator()
+        flag , err_msg = schema.validate()
+
+        return flag, err_msg
+
+    
     def load_data_into_tables(self, data, table_name):
         db = DBHandler(config_file=r'..\config\config.ini',section='DATABASE')
         conn = db.connect_to_database()
