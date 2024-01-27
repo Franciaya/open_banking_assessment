@@ -1,10 +1,11 @@
 import configparser
+import os
 
 class ConfigReader:
-    def __init__(self, config_file):
-        self.config_file = config_file
+    def __init__(self, config_file_path):
+        self.config_file_path = config_file_path
         self.config = configparser.ConfigParser()
-        self.config.read(config_file)
+        self.config.read(config_file_path)
 
     def get_section(self, section_name):
         """
@@ -38,3 +39,17 @@ class ConfigReader:
             return self.config.get(section_name, key)
         else:
             return None
+        
+#Usage:
+# script_dir = os.path.dirname(os.path.abspath(__file__))
+# config_file_path = os.path.join(script_dir, '..', 'config', 'config.ini')
+
+# # Create an instance of ConfigReader
+# config_reader = ConfigReader(config_file_path)
+
+# # Specify the section name
+# section_name = 'DATABASE'
+
+# # Retrieve a specific value from the specified section
+# db_host = config_reader.get_value(section_name, 'host')
+# print("Database Host:", db_host)       

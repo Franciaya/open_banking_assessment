@@ -59,7 +59,7 @@ class DataProcessor:
         return transformed_record, None
 
     def load_data_into_tables(self, data, table_name):
-        db = DBHandler(config_file=r'D:\open_banking_assessment\config.ini',section='DATABASE')
+        db = DBHandler(config_file=r'..\config\config.ini',section='DATABASE')
         conn = db.connect_to_database()
         with conn.cursor() as cursor:
             for record in data:
