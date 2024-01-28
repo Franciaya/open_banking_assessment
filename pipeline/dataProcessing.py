@@ -101,7 +101,7 @@ class DataProcessor:
             }   
 
         try:
-            # Convert to defined schema in config.ini before data mapping into PostgeSQL DB
+            # Convert data type to confirm to PostgeSQL transactions table - Data Mapping
             transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d').date()
             parsed_date = datetime.strptime(record['sourceDate'], "%Y-%m-%dT%H:%M:%S")
             source_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
@@ -146,8 +146,9 @@ class DataProcessor:
         return flag, err_msg
 
     
-    def load_data_into_tables(self, data, table_name):
-        db = DBHandler()
+    def load_data_into_tables(self, data, table_name,config_dir,config_filename,section_name):
+        
+        db = DBHandler(config_dir,config_filename,section_name)
         conn = db.connect_to_database()
         with conn.cursor() as cursor:
             for record in data:

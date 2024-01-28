@@ -1,20 +1,25 @@
 import os
 import psycopg2
 from configparser import ConfigParser
+from configurationReader import ConfigReader
 
 
 class DBHandler:
 
-    def __init__(self, config_file='config.ini', section='database'):
+    def __init__(self,config_dir:str,config_filename:str,section_name:str):
         """
         Initialize the DatabaseManager object with default config file and section.
 
         :param config_file: The path to the configuration file.
         :param section: The section in the configuration file containing database connection details.
         """
-
-        self.config_file = config_file
-        self.section = section
+        self.config_dir = config_dir
+        self.config_filename = config_filename
+        self.section_name = section_name
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
+        reader = ConfigReader(config_file_path)
+        self.dbConfig = reader.get_section(self.section_name)
 
     def readDB_config(self):
         """
@@ -22,18 +27,10 @@ class DBHandler:
 
         :return: A dictionary containing database connection parameters.
         """
-        parser = ConfigParser()
-        parser.read(self.config_file)
-
-        db_params = {}
-        if parser.has_section(self.section):
-            params = parser.items(self.section)
-            for param in params:
-                db_params[param[0]] = param[1]
+        if self.dbConfig:
+            return self.dbConfig
         else:
-            raise Exception(f'Section {self.section} not found in the {self.config_file} file')
-
-        return db_params
+            return {}
 
     def connect_to_database(self):
         try:
