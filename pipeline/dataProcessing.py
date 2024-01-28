@@ -1,6 +1,5 @@
 import json
 import os
-import psycopg2
 from datetime import datetime
 from psycopg2 import sql
 from currencyValidator import AllowedCurrencyValidator
@@ -8,10 +7,11 @@ from PostgreSQLCreateSchema import DBHandler
 from configurationReader import ConfigReader
 from schemaValidator import SchemaValidator
 import boto3
+from jsonDuplicateRemoval import JSONDuplicateRemover
 
 class DataProcessor:
 
-    def extract(self, location='local',type='json'):
+    def extract(self, location='local', type='json'):
 
         if location.lower() == 'local' and type == 'json':
             script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,25 +19,26 @@ class DataProcessor:
             j_files = os.listdir(json_file_path)
 
             if len(j_files) == 1:
-                j_file = os.path.join(json_file_path,j_files[0])
+                j_file = os.path.join(json_file_path, j_files[0])
                 
                 # Open the JSON file and read its contents
-                with open(j_files, 'r') as file:
+                with open(j_file, 'r') as file:
                     data = json.load(file)
 
                 return True, data
 
             else:
-                return False, "Empty or to many files in the directory"
+                return False, "Empty or too many files in the directory"
             
         elif location.lower() == 's3' and type == 'json':
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            config_file_path = os.path.join(script_dir, '..', 'input_data','config.ini')
+            config_file_path = os.path.join(script_dir, '..', 'config', 'config.ini')
             reader = ConfigReader(config_file_path)
 
-            ws_access_key_id = reader.get_value('AWS','aws_access_key_id')
-            aws_secret_access_key = reader.get_value('AWS','aws_secret_access_key')
-            bucket_name = reader.get_value('S3','bucket_name')
+            bucket_name = reader.get_value('S3', 'bucket_name')
+            ws_access_key_id = reader.get_value('AWS', 'aws_access_key_id')
+            aws_secret_access_key = reader.get_value('AWS', 'aws_secret_access_key')
+            
 
             # Create an S3 client using the AWS credentials
             s3 = boto3.client(
@@ -47,7 +48,7 @@ class DataProcessor:
             )
 
             # Specify the key (path) of the object you want to retrieve from the bucket
-            obj_key = reader.get_value('S3','key')
+            obj_key = reader.get_value('S3', 'key')
 
             try:
                 # Retrieve the object from the S3 bucket
@@ -90,6 +91,19 @@ class DataProcessor:
                 })
 
         return transformed_data, error_data
+    
+    def remove_duplicates(self, data, config_dir, config_filename, section_name, transactions_key, composite_keys, source_date_key):
+        """Removes duplicates from JSON file based on configuration."""
+        
+        rem = JSONDuplicateRemover(config_dir, config_filename, section_name)
+        config = rem.readJSON_config()
+        self.transaction_key = config.get(transactions_key)
+        self.composite_keys = config.get(composite_keys).split(',')
+        self.source_date_key = config.get(source_date_key)
+        filtered_data = rem.filter_duplicates(data, self.transaction_key, self.composite_keys, self.source_date_key)
+        print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
+        
+        return filtered_data
 
     def _process_record(self, record):
         allowedCur = AllowedCurrencyValidator()
@@ -138,7 +152,7 @@ class DataProcessor:
         
         return transformed_record, None
     
-    def _check_schema(self,record):
+    def _check_schema(self, record):
 
         schema = SchemaValidator()
         flag , err_msg = schema.validate()
@@ -146,30 +160,37 @@ class DataProcessor:
         return flag, err_msg
 
     
-    def load_data_into_tables(self, data, table_name,config_dir,config_filename,section_name):
-        
-        db = DBHandler(config_dir,config_filename,section_name)
-        conn = db.connect_to_database()
-        with conn.cursor() as cursor:
-            for record in data:
-                columns = record.keys()
-                values = [record[column] for column in columns]
+    def load_data_into_tables(self, data, table_name, config_dir, config_filename, section_name):
+        try:
+            db = DBHandler(config_dir, config_filename, section_name)
+            conn = db.connect_to_database()
+            with conn.cursor() as cursor:
+                for record in data:
+                    columns = record.keys()
+                    values = [record[column] for column in columns]
 
-                with open('upsert_query.sql', 'r') as query_file:
-                    upsert_query = sql.SQL(query_file.read()).format(
-                        table_name=sql.Identifier(table_name),
-                        columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
-                        placeholders=sql.SQL(', ').join(map(sql.Placeholder, columns)),
-                        update_columns=sql.SQL(', ').join(
-                            sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(column), sql.Identifier(column))
-                            for column in columns
+                    with open('upsert_query.sql', 'r') as query_file:
+                        upsert_query = sql.SQL(query_file.read()).format(
+                            table_name=sql.Identifier(table_name),
+                            columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
+                            placeholders=sql.SQL(', ').join(map(sql.Placeholder, columns)),
+                            update_columns=sql.SQL(', ').join(
+                                sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(column), sql.Identifier(column))
+                                for column in columns
+                            )
                         )
-                    )
 
-                cursor.execute(upsert_query, values)
+                    cursor.execute(upsert_query, values)
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            conn.rollback()
+
+
+
+
+
 
 
 # Example usage:
