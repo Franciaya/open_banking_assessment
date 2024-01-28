@@ -2,21 +2,32 @@ import json
 from collections import defaultdict
 from datetime import datetime
 import configparser
+from configurationReader import ConfigReader
+import os
 
 class JSONDuplicateRemover:
-    def __init__(self, config_file, section_name):
-        self.config_file = config_file
-        self.section_name = section_name
+    def __init__(self,config_dir,config_filename):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(script_dir, '..', config_dir, config_filename)
+        reader = ConfigReader(config_file_path)
+        self.section_name = reader.get_section('purge_duplicate')
 
     def readJSON_config(self):
         """Reads configuration from the .ini file."""
-        config = configparser.ConfigParser()
-        config.read(self.config_file)
-        return config[self.section_name]
+        # config = configparser.ConfigParser()
+        # config.read(self.config_file)
+        # return config[self.section_name]
+        if self.section_name:
+            return self.section_name
+        else:
+            return {}
 
-    def load_json(self, filename):
+    def load_json(self, input_file_dir,filename):
         """Loads JSON data from a file."""
-        with open(filename, 'r') as file:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(script_dir, '..', input_file_dir, filename)
+
+        with open(config_file_path, 'r') as file:
             data = json.load(file)
         return data
 
@@ -45,7 +56,7 @@ class JSONDuplicateRemover:
 def remove_duplicates(json_filename, output_filename):
     """Removes duplicates from JSON file based on configuration."""
 
-    config_file_path = r'C:\path\to\your\config.ini'
+    config_file_path = r'..\config\config.ini'
     section_name = 'your_section_name'
     #json_file_path = r'C:\path\to\your\data.json'
     #output_file_path = r'C:\path\to\your\filtered_data.json'
