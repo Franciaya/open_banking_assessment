@@ -1,0 +1,149 @@
+{
+    "customers": [
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
+            "transaction_id": "7b3c8eee-3689-4cf8-b874-dfbe515d2eb7",
+            "transaction_date": "2022-02-21"
+        },
+        {
+            "customer_id": "86d5c245-3d2b-4f68-811b-0b669c85ce72",
+            "transaction_id": "1453bc69-6a53-41c4-9505-956d84984678",
+            "transaction_date": "2023-06-10"
+        },
+        {
+            "customer_id": "8d6ce07e-4252-470c-a5c8-3709bb342512",
+            "transaction_id": "493fafd6-d383-4652-b508-e0c0b6d6163c",
+            "transaction_date": "2021-06-11"
+        },
+        {
+            "customer_id": "fb60e0c0-1cf5-40e8-b8d0-411f4568ba4c",
+            "transaction_id": "719e5c03-d560-4fab-818b-47fb5b6c9db1",
+            "transaction_date": "2021-01-04"
+        },
+        {
+            "customer_id": "cdd7313b-c60e-4f2a-bcb4-e92bc2238e57",
+            "transaction_id": "55d8efa6-d422-4c50-b848-43545217a09c",
+            "transaction_date": "2021-01-24"
+        },
+        {
+            "customer_id": "a2220d82-f79b-49b2-a45a-c27ddc4226f7",
+            "transaction_id": "591d9089-912d-4c28-8f3d-8e3493eaef5b",
+            "transaction_date": "2022-07-10"
+        },
+        {
+            "customer_id": "d6b1713e-bde0-42cc-a1f3-20c848016c90",
+            "transaction_id": "608bbfa1-815b-4a0a-8e9b-1b931a736d27",
+            "transaction_date": "2023-01-17"
+        },
+        {
+            "customer_id": "0b000de2-63f9-48e4-b9ef-36e2a797f804",
+            "transaction_id": "87439fdb-e1f9-4cd4-97f9-9415e49e0205",
+            "transaction_date": "2020-12-25"
+        },
+        {
+            "customer_id": "d2504718-4c64-4164-9134-90237235dd8c",
+            "transaction_id": "c3d44cb7-c3fc-455a-b755-560df60804f1",
+            "transaction_date": "2021-04-23"
+        },
+        {
+            "customer_id": "a62a6783-d908-4b5b-8b68-232bc422f60c",
+            "transaction_id": "34f9e539-bfb3-458e-98ba-5f5bb6079a65",
+            "transaction_date": "2020-03-25"
+        },
+        {
+            "customer_id": "4f53db95-a8aa-47c1-9ee3-0197a2ca5791",
+            "transaction_id": "ec19ebb5-8e01-4e62-9844-3740d92b2dad",
+            "transaction_date": "2023-11-10"
+        },
+        {
+            "customer_id": "b76cea0a-35e1-4703-a251-1ca4b440a3b5",
+            "transaction_id": "7ac3f255-4a0d-4642-bfd4-e3eaea96b762",
+            "transaction_date": "2021-12-14"
+        },
+        {
+            "customer_id": "bf6c10af-cfc8-465e-b624-6dd39c799a83",
+            "transaction_id": "40260a8b-c077-480a-a8d7-8c3e905f20d9",
+            "transaction_date": "2022-11-22"
+        },
+        {
+            "customer_id": "5adada47-ba86-42c7-a3d0-6c623ccf9df9",
+            "transaction_id": "5780e401-59e3-444f-9477-04ffd990f663",
+            "transaction_date": "2020-10-20"
+        },
+        {
+            "customer_id": "b4e5b5bb-658b-44dc-b892-9612286b5dc4",
+            "transaction_id": "494f6b2e-d393-4fad-bb1b-92088765ec39",
+            "transaction_date": "2021-04-07"
+        },
+        {
+            "customer_id": "959ef36a-09f1-4733-85bd-33542ddb8791",
+            "transaction_id": "e1905535-89ad-4cc8-a673-215e8aa5051a",
+            "transaction_date": "2019-04-01"
+        },
+        {
+            "customer_id": "e95a178a-bc64-432d-ada6-01336bbfecec",
+            "transaction_id": "11ee689c-7069-42d0-9235-445d88fac403",
+            "transaction_date": "2019-10-02"
+        },
+        {
+            "customer_id": "3d2ad8ed-460d-42e2-997c-176a42bdac9f",
+            "transaction_id": "d9b42a20-e7e0-4ed8-b77b-7da6812cc4af",
+            "transaction_date": "2019-04-07"
+        },
+        {
+            "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+            "transaction_id": "066fe7dc-5ca1-4fb9-a26b-053419021e2a",
+            "transaction_date": "2020-07-05"
+        },
+        {
+            "customer_id": "51a19d13-a5f2-4705-87d3-e9a71f62b445",
+            "transaction_id": "9cc351c8-ca63-4438-af55-b3e6921eac1c",
+            "transaction_date": "2020-12-31"
+        },
+        {
+            "customer_id": "c791956b-e75a-432b-9001-7630777485e7",
+            "transaction_id": "7f7d19e9-9969-451f-91d6-42ba3009d9e2",
+            "transaction_date": "2020-11-15"
+        },
+        {
+            "customer_id": "9e3361b2-91da-41b5-8fdf-b79cf90b77b1",
+            "transaction_id": "a491dd74-ace3-4864-ab1c-998ee6fa7fee",
+            "transaction_date": "2023-09-18"
+        },
+        {
+            "customer_id": "f6b63bf5-2bf4-4301-a9c8-c6ab7e961f33",
+            "transaction_id": "708d4540-6510-4e16-8d16-c24f8b9ae92e",
+            "transaction_date": "2022-12-20"
+        },
+        {
+            "customer_id": "3be6f678-6e7f-49c0-84ff-7a54c274078d",
+            "transaction_id": "73880a2f-edb8-4bb6-a288-c437eb0d96b0",
+            "transaction_date": "2021-03-17"
+        },
+        {
+            "customer_id": "4be3f96a-3ad3-4c63-82c5-35249b52862b",
+            "transaction_id": "4e585b52-09e5-46ee-b2dc-c07785a94f02",
+            "transaction_date": "2019-09-01"
+        },
+        {
+            "customer_id": "7cf08f69-a6dc-4d36-860b-1a35828f8366",
+            "transaction_id": "eac3fb08-f773-4ce9-90d0-8f23805dfa53",
+            "transaction_date": "2023-08-12"
+        },
+        {
+            "customer_id": "38532446-7f94-4b2f-8294-9f7ee4453051",
+            "transaction_id": "73b49ef0-ce1d-475d-9145-3f6ed14cb5c3",
+            "transaction_date": "2019-09-25"
+        },
+        {
+            "customer_id": "187f9365-f647-4184-bfbb-5667bc66a24f",
+            "transaction_id": "a457f3e8-7c4d-41ae-8327-074a50bc1b8b",
+            "transaction_date": "2020-11-09"
+        },
+        {
+            "customer_id": "a17c27dd-fca5-40c3-9194-0fb431fd2752",
+            "transaction_id": "ff0cedc3-229f-4f10-92a3-f1b01d033a22",
+            "transaction_date": "2022-05-06"
+        }
+    ]
+}

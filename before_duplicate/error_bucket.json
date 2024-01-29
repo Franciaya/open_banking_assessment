@@ -1,0 +1,87 @@
+[
+    {
+        "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
+        "transaction_id": "aaa6faa9-1245-43d5-a67a-bbdbc8afd641",
+        "error_message": "Invalid format: unconverted data remains: 2"
+    },
+    {
+        "customer_id": "86d5c245-3d2b-4f68-811b-0b669c85ce72",
+        "transaction_id": "14434f14-dd55-4b86-8263-380f8924af7a",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "a2220d82-f79b-49b2-a45a-c27ddc4226f7",
+        "transaction_id": "e0380b02-0387-4aa0-a53a-1e91a88c231e",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "a2220d82-f79b-49b2-a45a-c27ddc4226f7",
+        "transaction_id": "e0380b02-0387-4aa0-a53a-1e91a88c231e",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "a2220d82-f79b-49b2-a45a-c27ddc4226f7",
+        "transaction_id": "e8e59a13-9752-47ed-b1fc-7e8217bbd6c7",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "5adada47-ba86-42c7-a3d0-6c623ccf9df9",
+        "transaction_id": "b3777dfb-1d67-4ddb-84d8-f4c4abe98d07",
+        "error_message": "Invalid format: time data 'NaN' does not match format '%Y-%m-%d'"
+    },
+    {
+        "customer_id": "5adada47-ba86-42c7-a3d0-6c623ccf9df9",
+        "transaction_id": "410f5ba5-10d2-445d-b613-d9f4a74697b7",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "5adada47-ba86-42c7-a3d0-6c623ccf9df9",
+        "transaction_id": "1c7aa76c-12f0-4ccb-9af1-a5c31488032c",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "b4e5b5bb-658b-44dc-b892-9612286b5dc4",
+        "transaction_id": "498f180a-e004-495a-ba24-1af439ee5771",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "959ef36a-09f1-4733-85bd-33542ddb8791",
+        "transaction_id": "204a9149-0d8e-41fb-b712-8e273e9aeb9f",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+        "transaction_id": "a268ce67-fbdc-4804-8dad-794cbd4d91da",
+        "error_message": "Invalid format: time data 'NaN' does not match format '%Y-%m-%d'"
+    },
+    {
+        "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+        "transaction_id": "6ad1fa77-4b8b-4237-8bd0-b67280866500",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+        "transaction_id": "3fa386d3-3ccf-4fcb-aa03-2cb57bb36953",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+        "transaction_id": "1906dfc3-ea1b-4d0a-9a51-b667428440c7",
+        "error_message": "Invalid currency"
+    },
+    {
+        "customer_id": "3be6f678-6e7f-49c0-84ff-7a54c274078d",
+        "transaction_id": "d2c7571f-3d2c-4508-b92b-25c5edd6016b",
+        "error_message": "Invalid format: time data 'NaN' does not match format '%Y-%m-%d'"
+    },
+    {
+        "customer_id": "7cf08f69-a6dc-4d36-860b-1a35828f8366",
+        "transaction_id": "f753520e-4a73-43bf-b50a-ec0bebcea98f",
+        "error_message": "Invalid format: time data '1-01-31' does not match format '%Y-%m-%d'"
+    },
+    {
+        "customer_id": "38532446-7f94-4b2f-8294-9f7ee4453051",
+        "transaction_id": "c2ff8449-d1f8-43bd-a480-136b6439563c",
+        "error_message": "Invalid format: time data '2' does not match format '%Y-%m-%d'"
+    }
+]

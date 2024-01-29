@@ -36,16 +36,23 @@ class JSONDuplicateRemover:
 
     def filter_duplicates(self, data, transaction_key, composite_keys, source_date_key):
         """Removes duplicates from JSON data based on composite keys."""
+        empty_list = []
         unique_transactions = defaultdict(dict)
+
         for transaction in data[transaction_key]:
-            composite_key = tuple(transaction[key] for key in composite_keys)
-            if composite_key not in unique_transactions:
-                unique_transactions[composite_key] = transaction
-            else:
-                current_source_date = datetime.fromisoformat(transaction[source_date_key])
-                existing_source_date = datetime.fromisoformat(unique_transactions[composite_key][source_date_key])
-                if current_source_date > existing_source_date:
+
+            if transaction is not None:
+                composite_key = tuple(transaction[key] for key in composite_keys)
+                # print("Details: ",composite_key)
+                # return None
+                if composite_key not in unique_transactions:
                     unique_transactions[composite_key] = transaction
+                else:
+                    current_source_date = datetime.fromisoformat(transaction[source_date_key])
+                    existing_source_date = datetime.fromisoformat(unique_transactions[composite_key][source_date_key])
+                    if current_source_date > existing_source_date:
+                        unique_transactions[composite_key] = transaction
+
         filtered_transactions = list(unique_transactions.values())
         return {transaction_key: filtered_transactions}
 
@@ -68,6 +75,6 @@ class JSONDuplicateRemover:
 # data = rem.load_json('input_data','tech_assessment_transactions.json')
 # print("Count before duplicate removal: ",len(data[transaction_key]))
 # filtered_data = rem.filter_duplicates(data, transaction_key, composite_keys, source_date_key)
-# print("Count after duplicate removal: ",len(filtered_data[transaction_key]))
-# rem.save_json(filtered_data,dump_folder, 'curated_data.json')
-# print("Duplicates removed and filtered data saved to: ", dump_folder)
+# # print("Count after duplicate removal: ",len(filtered_data[transaction_key]))
+# # rem.save_json(filtered_data,dump_folder, 'curated_data.json')
+# # print("Duplicates removed and filtered data saved to: ", dump_folder)

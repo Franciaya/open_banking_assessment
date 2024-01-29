@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import date, datetime
+from datetime import datetime, date
 from psycopg2 import sql
 from currencyValidator import AllowedCurrencyValidator
 from PostgreSQLCreateSchema import DBHandler
@@ -12,6 +12,7 @@ from jsonDuplicateRemoval import JSONDuplicateRemover
 class DataProcessing:
 
     def __init__(self,config_dir,config_filename,db_section_name,dup_section_name):
+
         self.config_dir = config_dir
         self.config_filename = config_filename
         self.dup_section_name = dup_section_name
@@ -80,6 +81,7 @@ class DataProcessing:
 
 
     def process_data(self, data):
+
         transformed_data = []
         error_data = []
         transactions = data.get("transactions", [])
@@ -95,11 +97,16 @@ class DataProcessing:
                     'transaction_id': record.get('transactionId'),
                     'error_message': str(f'Error in processing data due to: {e}')
                 })
+        trans_data = {
 
-        return transformed_data, error_data
+            "transactions":json.loads(json.dumps(transformed_data))
+
+        }
+        return trans_data, error_data
     
 
     def _process_record(self, record):
+
         allowedCur = AllowedCurrencyValidator()
         if not allowedCur.validate(record['currency']):
             return None, {
@@ -110,7 +117,7 @@ class DataProcessing:
 
         try:
             # Convert data type to confirm to PostgeSQL transactions table - Data Mapping
-            transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d')
+            transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d').date()
             parsed_date = datetime.strptime(record['sourceDate'], "%Y-%m-%dT%H:%M:%S")
             source_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
             amount = float(record['amount'])
@@ -125,8 +132,8 @@ class DataProcessing:
         transformed_record = {
             'customer_id': record['customerId'],
             'transaction_id': record['transactionId'],
-            'transaction_date': transaction_date,
-            'source_date': source_date,
+            'transaction_date': str(transaction_date),
+            'source_date': str(source_date),
             'merchant_id': record['merchantId'],
             'category_id': record['categoryId'],
             'amount': amount,
@@ -146,6 +153,7 @@ class DataProcessing:
         return transformed_record, None
     
     def _check_schema(self, record):
+
         """Schema checks for data type and structure to ensure DQ"""
         schema = SchemaValidator()
         flag , err_msg = schema.validate(record)
@@ -153,6 +161,7 @@ class DataProcessing:
         return flag, err_msg
     
     def remove_duplicates(self, data,transactions_key, composite_keys, source_date_key):
+
         """Removes duplicates from JSON file based on configuration."""
         
         rem = JSONDuplicateRemover(self.config_dir, self.config_filename, self.dup_section_name)
@@ -160,17 +169,31 @@ class DataProcessing:
         self.transaction_key = config.get(transactions_key)
         self.composite_keys = config.get(composite_keys).split(',')
         self.source_date_key = config.get(source_date_key)
+
         filtered_data = rem.filter_duplicates(data, self.transaction_key, self.composite_keys, self.source_date_key)
-        print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
+        #print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
+
         
         return filtered_data
     
-    def transform_data(self,transactions_data):
+    def transform_data(self,transactions_data,obj_key):
 
-        customers_list = [{"customer_id": transaction["customer_id"], 
-                           "transaction_id": transaction["transaction_id"]} for transaction in transactions_data]
         # Convert the extracted data to JSON format
-        customers_data = json.dumps(customers_list, indent=4)
+        distinct_customers = {}
+
+        for customer in transactions_data[obj_key]:
+            customer_id = customer['customer_id']
+            if customer_id not in distinct_customers:
+                distinct_customers[customer_id] = {
+                    "customer_id": customer_id,
+                    "transaction_id": customer["transaction_id"],
+                    "transaction_date": customer["transaction_date"]
+                }
+
+        customers_list = list(distinct_customers.values())
+        customers_data = {
+                "customers":json.loads(json.dumps(customers_list, indent=4))
+        }
 
         return customers_data
     
@@ -207,7 +230,17 @@ print(f"Data returns {flag}")
 if flag:
     transformed_data, error_data = processor.process_data(data)
 dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
-dup.save_json(transformed_data,'clean_dump','transact_transformed.json')
-dup.save_json(error_data,'clean_dump','error_bucket.json')
+print("Count before duplicate removal: ", len(transformed_data['transactions']))
+# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')
+# dup.save_json(error_data,'clean_dump','error_bucket.json')
+
+filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
+dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
+print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
+
+transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions')
+dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
+print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
+
 # Load data into tables
 #processor.load_data_into_tables(transformed_data, 'your_table_name')
