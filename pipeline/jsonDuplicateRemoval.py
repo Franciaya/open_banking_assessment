@@ -11,9 +11,8 @@ class JSONDuplicateRemover:
         self.config_dir = config_dir
         self.config_filename = config_filename
         self.section_name = section_name
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
         reader = ConfigReader(config_file_path)
         self.section_name_dict = reader.get_section(self.section_name)
 
@@ -29,8 +28,7 @@ class JSONDuplicateRemover:
 
     def load_json(self, input_file_dir,filename):
         """Loads JSON data from a file."""
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(script_dir, '..', input_file_dir, filename)
+        config_file_path = os.path.join(self.script_dir, '..', input_file_dir, filename)
 
         with open(config_file_path, 'r') as file:
             data = json.load(file)
@@ -53,8 +51,7 @@ class JSONDuplicateRemover:
 
     def save_json(self, data, output_file_dir,filename):
         """Saves JSON data to a file."""
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(script_dir, '..', output_file_dir, filename)
+        config_file_path = os.path.join(self.script_dir, '..', output_file_dir, filename)
 
         with open(config_file_path, 'w') as file:
             json.dump(data, file, indent=4)

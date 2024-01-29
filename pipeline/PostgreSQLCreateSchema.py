@@ -62,3 +62,5 @@ class DBHandler:
         except psycopg2.Error as e:
             print("Error executing SQL files:", e)
             conn.rollback()
+
+

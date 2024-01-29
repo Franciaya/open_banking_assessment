@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
 from psycopg2 import sql
 from currencyValidator import AllowedCurrencyValidator
 from PostgreSQLCreateSchema import DBHandler
@@ -9,13 +9,20 @@ from schemaValidator import SchemaValidator
 import boto3
 from jsonDuplicateRemoval import JSONDuplicateRemover
 
-class DataProcessor:
+class DataProcessing:
 
-    def extract(self, location='local', type='json'):
+    def __init__(self,config_dir,config_filename,db_section_name,dup_section_name):
+        self.config_dir = config_dir
+        self.config_filename = config_filename
+        self.dup_section_name = dup_section_name
+        self.db_section_name = db_section_name
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        
 
-        if location.lower() == 'local' and type == 'json':
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            json_file_path = os.path.join(script_dir, '..', 'input_data')
+    def extract(self, file_location, file_type,input_dir):
+
+        if file_location.lower() == 'local' and file_type == 'json':
+            json_file_path = os.path.join(self.script_dir, '..', input_dir)
             j_files = os.listdir(json_file_path)
 
             if len(j_files) == 1:
@@ -30,9 +37,8 @@ class DataProcessor:
             else:
                 return False, "Empty or too many files in the directory"
             
-        elif location.lower() == 's3' and type == 'json':
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            config_file_path = os.path.join(script_dir, '..', 'config', 'config.ini')
+        elif file_location.lower() == 's3' and file_type == 'json':
+            config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
             reader = ConfigReader(config_file_path)
 
             bucket_name = reader.get_value('S3', 'bucket_name')
@@ -76,8 +82,8 @@ class DataProcessor:
     def process_data(self, data):
         transformed_data = []
         error_data = []
-
-        for record in data:
+        transactions = data.get("transactions", [])
+        for record in transactions:
             try:
                 transformed_record, error_record = self._process_record(record)
                 transformed_data.append(transformed_record)
@@ -92,18 +98,6 @@ class DataProcessor:
 
         return transformed_data, error_data
     
-    def remove_duplicates(self, data, config_dir, config_filename, section_name, transactions_key, composite_keys, source_date_key):
-        """Removes duplicates from JSON file based on configuration."""
-        
-        rem = JSONDuplicateRemover(config_dir, config_filename, section_name)
-        config = rem.readJSON_config()
-        self.transaction_key = config.get(transactions_key)
-        self.composite_keys = config.get(composite_keys).split(',')
-        self.source_date_key = config.get(source_date_key)
-        filtered_data = rem.filter_duplicates(data, self.transaction_key, self.composite_keys, self.source_date_key)
-        print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
-        
-        return filtered_data
 
     def _process_record(self, record):
         allowedCur = AllowedCurrencyValidator()
@@ -116,12 +110,12 @@ class DataProcessor:
 
         try:
             # Convert data type to confirm to PostgeSQL transactions table - Data Mapping
-            transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d').date()
+            transaction_date = datetime.strptime(record['transactionDate'], '%Y-%m-%d')
             parsed_date = datetime.strptime(record['sourceDate'], "%Y-%m-%dT%H:%M:%S")
             source_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
             amount = float(record['amount'])
 
-        except ValueError as e:
+        except Exception as e:
             return None, {
                 'customer_id': record['customerId'],
                 'transaction_id': record['transactionId'],
@@ -130,7 +124,6 @@ class DataProcessor:
 
         transformed_record = {
             'customer_id': record['customerId'],
-            'customer_name': record['customerName'],
             'transaction_id': record['transactionId'],
             'transaction_date': transaction_date,
             'source_date': source_date,
@@ -153,16 +146,37 @@ class DataProcessor:
         return transformed_record, None
     
     def _check_schema(self, record):
-
+        """Schema checks for data type and structure to ensure DQ"""
         schema = SchemaValidator()
-        flag , err_msg = schema.validate()
+        flag , err_msg = schema.validate(record)
 
         return flag, err_msg
-
     
-    def load_data_into_tables(self, data, table_name, config_dir, config_filename, section_name):
+    def remove_duplicates(self, data,transactions_key, composite_keys, source_date_key):
+        """Removes duplicates from JSON file based on configuration."""
+        
+        rem = JSONDuplicateRemover(self.config_dir, self.config_filename, self.dup_section_name)
+        config = rem.readJSON_config()
+        self.transaction_key = config.get(transactions_key)
+        self.composite_keys = config.get(composite_keys).split(',')
+        self.source_date_key = config.get(source_date_key)
+        filtered_data = rem.filter_duplicates(data, self.transaction_key, self.composite_keys, self.source_date_key)
+        print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
+        
+        return filtered_data
+    
+    def transform_data(self,transactions_data):
+
+        customers_list = [{"customer_id": transaction["customer_id"], 
+                           "transaction_id": transaction["transaction_id"]} for transaction in transactions_data]
+        # Convert the extracted data to JSON format
+        customers_data = json.dumps(customers_list, indent=4)
+
+        return customers_data
+    
+    def load_data_into_tables(self, data, table_name):
         try:
-            db = DBHandler(config_dir, config_filename, section_name)
+            db = DBHandler(self.config_dir, self.config_filename, self.db_section_name)
             conn = db.connect_to_database()
             with conn.cursor() as cursor:
                 for record in data:
@@ -173,11 +187,7 @@ class DataProcessor:
                         upsert_query = sql.SQL(query_file.read()).format(
                             table_name=sql.Identifier(table_name),
                             columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
-                            placeholders=sql.SQL(', ').join(map(sql.Placeholder, columns)),
-                            update_columns=sql.SQL(', ').join(
-                                sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(column), sql.Identifier(column))
-                                for column in columns
-                            )
+                            placeholders=sql.SQL(', ').join(map(sql.Placeholder, columns))
                         )
 
                     cursor.execute(upsert_query, values)
@@ -189,40 +199,15 @@ class DataProcessor:
 
 
 
-
-
-
-
-# Example usage:
-# if __name__ == "__main__":
-#     # Initialize DataProcessor with database configuration
-#     db_config = {
-#         'dbname': 'your_dbname',
-#         'user': 'your_username',
-#         'password': 'your_password',
-#         'host': 'your_host',
-#         'port': 'your_port'
-#     }
-#     processor = DataProcessor(db_config)
-
-#     # Example JSON data
-#     data = [
-#         {
-#             'customerId': 1,
-#             'transactionId': 101,
-#             'transactionDate': '2023-01-01',
-#             'sourceDate': '2023-01-01',
-#             'merchantId': 1001,
-#             'categoryId': 2001,
-#             'amount': 100.0,
-#             'description': 'Purchase',
-#             'currency': 'USD'
-#         },
-#         # Add more data records as needed
-#     ]
-
-#     # Process data
-#     transformed_data, error_data = processor.process_data(data)
-
-#     # Load data into tables
-#     processor.load_data_into_tables(transformed_data, 'your_table_name')
+transformed_data,error_data = None,None
+processor = DataProcessing('config','config.ini','DATABASE','purge_duplicate')
+# Process data
+flag, data = processor.extract('local','json','input_data')
+print(f"Data returns {flag}")
+if flag:
+    transformed_data, error_data = processor.process_data(data)
+dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
+dup.save_json(transformed_data,'clean_dump','transact_transformed.json')
+dup.save_json(error_data,'clean_dump','error_bucket.json')
+# Load data into tables
+#processor.load_data_into_tables(transformed_data, 'your_table_name')

@@ -1,14 +1,12 @@
-
+/*
 CREATE TABLE IF NOT EXISTS customers (
                 customer_id VARCHAR(255),
-                last_transaction_date DATE,
+                transaction_date DATE,
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (customer_id)
 );
-
 CREATE TABLE IF NOT EXISTS transactions (
                 customer_id VARCHAR(255) NOT NULL,
-                customer_name VARCHAR(255),
                 transaction_id VARCHAR(255) NOT NULL,
                 transaction_date DATE,
                 source_date TIMESTAMP,
@@ -18,13 +16,13 @@ CREATE TABLE IF NOT EXISTS transactions (
                 description VARCHAR(255),
                 currency VARCHAR(3),
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (customer_id, transaction_id)
+                PRIMARY KEY (customer_id, transaction_id),
                 FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
-
 CREATE TABLE IF NOT EXISTS error_log_tab (
                 customer_id VARCHAR(255),
                 transaction_id VARCHAR(255),
                 error_message VARCHAR(255),
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+*/
