@@ -1,4 +1,4 @@
-# Open Banking Pipeline Documentation
+# Open Banking Pipeline
 This documentation provides an overview of the Open Banking Pipeline task, including its structure, components, requirements, and usage instructions.<br>
 Building a roburst and maintainable data pipeline for processing dummy source data in JSON format, which simulates Open Banking transaction data, is the focus of this work. The workload involves<br> conducting a few Data Quality checks on the incoming data before transforming and inserting it into two PostgreSQL tables.The project emphasizes modularity, extensibility, and automation to streamline the data processing workflow.<br>
 
