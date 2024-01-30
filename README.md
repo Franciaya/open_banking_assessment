@@ -91,9 +91,9 @@ To set up and run the Open Banking Pipeline project, follow these steps:<br>
           Install Python dependencies using pip:<br>
 
 
-3.Copy code<br>
-          pip install -r requirements.txt<br>
-          Configure the config.ini file in the config/ directory with database connection details, data processing parameters, and other settings as per your requirements.<br>
+ 3.Copy code<br>
+            pip install -r requirements.txt<br>
+            Configure the config.ini file in the config/ directory with database connection details, data processing parameters, and other settings as per your requirements.<br>
 
 4. Ensure that Apache Airflow is installed and configured properly on your system. Refer to the Apache Airflow documentation for installation instructions.<br>
 
