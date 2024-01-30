@@ -81,27 +81,27 @@ Other Dependencies: Additional Python packages listed in the requirements.txt fi
 To set up and run the Open Banking Pipeline project, follow these steps:<br>
 
 1. Clone the project repository from GitHub:<br>
-          Copy code<br>
-          git clone <repository-url><br>
-          Navigate to the project directory:<br>
+   git clone <repository-url><br>
+          
 
 
-2. Copy code<br>
-          cd open_banking_pipeline<br>
-          Install Python dependencies using pip:<br>
+2. Navigate to the project directory:<br>
+   cd open_banking_pipeline<br>
+          
 
 
- 3.Copy code<br>
-            pip install -r requirements.txt<br>
-            Configure the config.ini file in the config/ directory with database connection details, data processing parameters, and other settings as per your requirements.<br>
+ 3.Install Python dependencies using pip:<br>
+   pip install -r requirements.txt<br>
+          
+4. Configure the config.ini file in the config/ directory with database connection details, data processing parameters, and other settings as per your requirements.<br>
 
-4. Ensure that Apache Airflow is installed and configured properly on your system. Refer to the Apache Airflow documentation for installation instructions.<br>
+5. Ensure that Apache Airflow is installed and configured properly on your system. Refer to the Apache Airflow documentation for installation instructions.<br>
 
-5. Configure Apache Airflow to include the Open Banking Pipeline workflow. This typically involves defining DAGs (Directed Acyclic Graphs) to orchestrate the data processing tasks.<br>
+6. Configure Apache Airflow to include the Open Banking Pipeline workflow. This typically involves defining DAGs (Directed Acyclic Graphs) to orchestrate the data processing tasks.<br>
 
-6. Implement and configure DAGs in Apache Airflow to include tasks for extracting, processing, and loading banking transaction data using the Python scripts provided in the scripts/ directory.<br>
+7. Implement and configure DAGs in Apache Airflow to include tasks for extracting, processing, and loading banking transaction data using the Python scripts provided in the scripts/ directory.<br>
 
-7. Configure monitoring and logging mechanisms within Apache Airflow to track the progress and performance of the data processing workflow.<br>
+8. Configure monitoring and logging mechanisms within Apache Airflow to track the progress and performance of the data processing workflow.<br>
 
 # Usage<br>
 Once the project is set up and configured, you can use it to process banking transaction data as follows:<br>
