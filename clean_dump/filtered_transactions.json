@@ -213,11 +213,11 @@
             "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
             "transaction_id": "5563e254-32e1-415c-adb4-ff79a36f6389",
             "transaction_date": "2020-07-29",
-            "source_date": "2020-08-02 14:08:23",
-            "merchant_id": 51,
-            "category_id": 2,
+            "source_date": "2020-08-02 13:10:25",
+            "merchant_id": 46,
+            "category_id": 7,
             "amount": 1708.74,
-            "description": "Roberts, Estrada and Brown | Groceries",
+            "description": "Brady Inc | Charity",
             "currency": "GBP"
         },
         {
@@ -382,6 +382,17 @@
             "merchant_id": 51,
             "category_id": 2,
             "amount": -282.62,
+            "description": "Roberts, Estrada and Brown | Groceries",
+            "currency": "GBP"
+        },
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
+            "transaction_id": "5563e254-32e1-415c-adb4-ff79a36f6389",
+            "transaction_date": "2020-07-29",
+            "source_date": "2020-08-02 14:08:23",
+            "merchant_id": 51,
+            "category_id": 2,
+            "amount": 1708.74,
             "description": "Roberts, Estrada and Brown | Groceries",
             "currency": "GBP"
         },
@@ -18873,6 +18884,17 @@
             "merchant_id": 63,
             "category_id": 1,
             "amount": 643.0,
+            "description": "Garcia LLC | Transport",
+            "currency": "GBP"
+        },
+        {
+            "customer_id": "a2220d82-f79b-49b2-a45a-c27ddc4226f7",
+            "transaction_id": "e8e59a13-9752-47ed-b1fc-7e8217bbd6c7",
+            "transaction_date": "2023-04-11",
+            "source_date": "2023-04-16 15:39:17",
+            "merchant_id": 63,
+            "category_id": 1,
+            "amount": 643.9,
             "description": "Garcia LLC | Transport",
             "currency": "GBP"
         },
@@ -47909,11 +47931,11 @@
             "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
             "transaction_id": "ef607675-7ce7-47da-b27e-c1aaad4c8bed",
             "transaction_date": "2020-03-15",
-            "source_date": "2020-03-24 09:34:01",
+            "source_date": "2020-03-22 20:35:02",
             "merchant_id": 39,
             "category_id": 1,
-            "amount": -208.9,
-            "description": "Payment to friend",
+            "amount": -208.11,
+            "description": "Bryant PLC | Transport",
             "currency": "USD"
         },
         {
@@ -47947,6 +47969,17 @@
             "category_id": 8,
             "amount": -403.53,
             "description": "Jones Group | Finances",
+            "currency": "USD"
+        },
+        {
+            "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+            "transaction_id": "ef607675-7ce7-47da-b27e-c1aaad4c8bed",
+            "transaction_date": "2020-03-15",
+            "source_date": "2020-03-23 10:34:01",
+            "merchant_id": 39,
+            "category_id": 1,
+            "amount": -208.9,
+            "description": "Bryant PLC | Transport",
             "currency": "USD"
         },
         {
@@ -48123,6 +48156,28 @@
             "category_id": 3,
             "amount": 1216.65,
             "description": "Brown-Hamilton | Shopping",
+            "currency": "USD"
+        },
+        {
+            "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+            "transaction_id": "798dcb2e-06e6-4171-93ae-edd3dd87fe0e",
+            "transaction_date": "2021-02-08",
+            "source_date": "2021-02-10 09:40:48",
+            "merchant_id": 55,
+            "category_id": 7,
+            "amount": -970.81,
+            "description": "Vega-Newton | Charity",
+            "currency": "USD"
+        },
+        {
+            "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+            "transaction_id": "798dcb2e-06e6-4171-93ae-edd3dd87fe0e",
+            "transaction_date": "2021-03-05",
+            "source_date": "2021-03-06 10:08:08",
+            "merchant_id": 94,
+            "category_id": 9,
+            "amount": 62.36,
+            "description": "Pennington-White | Health & Beauty",
             "currency": "USD"
         },
         {
@@ -48882,6 +48937,17 @@
             "category_id": 3,
             "amount": 410.99,
             "description": "07384305943 | Shopping",
+            "currency": "USD"
+        },
+        {
+            "customer_id": "c982459e-8a2c-45ee-9dab-28e627bde5f6",
+            "transaction_id": "ef607675-7ce7-47da-b27e-c1aaad4c8bed",
+            "transaction_date": "2020-03-15",
+            "source_date": "2020-03-24 09:34:01",
+            "merchant_id": 39,
+            "category_id": 1,
+            "amount": -208.9,
+            "description": "Payment to friend",
             "currency": "USD"
         },
         {

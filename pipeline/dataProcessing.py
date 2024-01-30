@@ -8,6 +8,7 @@ from configurationReader import ConfigReader
 from schemaValidator import SchemaValidator
 import boto3
 from jsonDuplicateRemoval import JSONDuplicateRemover
+import pandas as pd
 
 class DataProcessing:
 
@@ -153,17 +154,15 @@ class DataProcessing:
         return transformed_record, None
     
     def _check_schema(self, record):
-
-        """Schema checks for data type and structure to ensure DQ"""
+        #Schema checks for data type and structure to ensure DQ"""
         schema = SchemaValidator()
         flag , err_msg = schema.validate(record)
 
         return flag, err_msg
     
     def remove_duplicates(self, data,transactions_key, composite_keys, source_date_key):
-
-        """Removes duplicates from JSON file based on configuration."""
         
+        #Removes duplicates from JSON file based on configuration.
         rem = JSONDuplicateRemover(self.config_dir, self.config_filename, self.dup_section_name)
         config = rem.readJSON_config()
         self.transaction_key = config.get(transactions_key)
@@ -176,17 +175,16 @@ class DataProcessing:
         
         return filtered_data
     
-    def transform_data(self,transactions_data,obj_key):
+    def transform_data(self,transactions_data,schema_key,col_key):
 
         # Convert the extracted data to JSON format
         distinct_customers = {}
 
-        for customer in transactions_data[obj_key]:
-            customer_id = customer['customer_id']
+        for customer in transactions_data[schema_key]:
+            customer_id = customer[col_key]
             if customer_id not in distinct_customers:
                 distinct_customers[customer_id] = {
                     "customer_id": customer_id,
-                    "transaction_id": customer["transaction_id"],
                     "transaction_date": customer["transaction_date"]
                 }
 
@@ -197,50 +195,111 @@ class DataProcessing:
 
         return customers_data
     
-    def load_data_into_tables(self, data, table_name):
+    def emptyRecordDump(self,data,key):
+        filtered_transactions = []
+        for transaction in data[key]:
+            try:
+                if 'customer_id' in transaction and 'transaction_id' in transaction:
+                    filtered_transactions.append(transaction)
+            except TypeError as e:
+                print(f"Error: {e}")
+
+        data[key] = filtered_transactions
+
+        return data
+
+
+    def load_data_into_tables(self, data,schema,tbl,sql_folder,filename):
         try:
             db = DBHandler(self.config_dir, self.config_filename, self.db_section_name)
             conn = db.connect_to_database()
             with conn.cursor() as cursor:
-                for record in data:
-                    columns = record.keys()
-                    values = [record[column] for column in columns]
-
-                    with open('upsert_query.sql', 'r') as query_file:
-                        upsert_query = sql.SQL(query_file.read()).format(
-                            table_name=sql.Identifier(table_name),
+                for record in data[schema]:   
+                    columns = list(record.keys())
+                    # values = [record[column] for column in columns]
+                    values = list(record.values())
+                    with open(os.path.join(sql_folder, filename), 'r') as query_file:
+                            
+                        query_template= query_file.read().strip()
+                        upsert_query = sql.SQL(query_template).format(
+                            table_name=sql.Identifier(tbl),
                             columns=sql.SQL(', ').join(map(sql.Identifier, columns)),
-                            placeholders=sql.SQL(', ').join(map(sql.Placeholder, columns))
+                            placeholders=sql.SQL(', ').join(sql.Placeholder() * len(columns))
                         )
-
-                    cursor.execute(upsert_query, values)
-
+                    
+                    if len(values) == len(columns):
+                        # Execute the query with values
+                        cursor.execute(upsert_query, values)
+                    else:
+                        print("Error: Number of values does not match number of columns")
+                   
             conn.commit()
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            print(f"An error occurred: {str(e)}",f" and the type of error is {type(e)}")
             conn.rollback()
 
 
 
-transformed_data,error_data = None,None
-processor = DataProcessing('config','config.ini','DATABASE','purge_duplicate')
-# Process data
-flag, data = processor.extract('local','json','input_data')
-print(f"Data returns {flag}")
-if flag:
-    transformed_data, error_data = processor.process_data(data)
-dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
-print("Count before duplicate removal: ", len(transformed_data['transactions']))
-# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')
+# transformed_data,error_data = None,None
+# processor = DataProcessing('config','config.ini','DATABASE','purge_duplicate')
+# # Process data
+# flag, data = processor.extract('local','json','input_data')
+# print(f"Data returns {flag}")
+# if flag:
+#     transformed_data, error_data = processor.process_data(data)
+# dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
+# print("Count before duplicate removal: ", len(transformed_data['transactions']))
+# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')cls
 # dup.save_json(error_data,'clean_dump','error_bucket.json')
 
-filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
-dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
-print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
+#filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
+#dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
+#print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
 
-transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions')
-dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
-print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
+#transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions','customer_id')
+#dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
+# print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
+# processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')
 
+
+#df = pd.DataFrame(transformed_data['transactions'])
+# df = pd.DataFrame.from_dict(transformed_data, orient='index')
+
+# null_customer_id = df[df['customer_id'].isnull()]
+# null_transaction_id = df[df['transaction_id'].isnull()]
+
+# # Print records with null values for 'customer_id'
+# print("Records with null 'customer_id':")
+# print(null_customer_id)
+
+# # Print records with null values for 'transaction_id'
+# print("\nRecords with null 'transaction_id':")
+# print(null_transaction_id)
+
+# # Step 4: Remove Null Values
+# #clean_df = df.dropna()
+
+#
+#print("Successful")
 # Load data into tables
 #processor.load_data_into_tables(transformed_data, 'your_table_name')
+
+
+
+# records_with_nulls = []
+# for transaction in transformed_data['transactions']:
+#     try:
+#         print(type(transaction))
+#         if transaction['customer_id'] is None or transaction['transaction_id'] is None:
+#             records_with_nulls.append(transaction)
+
+#     except TypeError as e:
+#         print(f"Error: {e}" )
+
+# # Print records with null values
+# print("Records with null values for 'customer_id' or 'transaction_id':")
+# for record in records_with_nulls:
+#     print(record)
+
+# Convert JSON data to Python dictionary
+#data_dict = json.loads(json_data)

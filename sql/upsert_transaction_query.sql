@@ -1,10 +1,7 @@
-
-/*
 INSERT INTO {table_name} ({columns})
 VALUES ({placeholders})
 ON CONFLICT (customer_id, transaction_id) 
 DO UPDATE SET 
-    customer_name = EXCLUDED.customer_name,
     transaction_date = EXCLUDED.transaction_date,
     source_date = EXCLUDED.source_date,
     merchant_id = EXCLUDED.merchant_id,
@@ -13,5 +10,3 @@ DO UPDATE SET
     description = EXCLUDED.description,
     currency = EXCLUDED.currency
 WHERE EXCLUDED.source_date > {table_name}.source_date;
-
-*/

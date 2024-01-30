@@ -10,7 +10,3 @@ class AllowedCurrencyValidator:
 
     def validate(self, currency):
         return currency in self.allowed_currencies
-    
-
-sam = AllowedCurrencyValidator()
-print(sam.validate('NGN'))

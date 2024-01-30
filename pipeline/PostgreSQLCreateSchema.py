@@ -64,3 +64,7 @@ class DBHandler:
             conn.rollback()
 
 
+
+# db = DBHandler('config','config.ini','DATABASE')
+# con = db.connect_to_database()
+# db.execute_sql_files(con)

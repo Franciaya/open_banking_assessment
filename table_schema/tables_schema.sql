@@ -1,4 +1,4 @@
-/*
+
 CREATE TABLE IF NOT EXISTS customers (
                 customer_id VARCHAR(255),
                 transaction_date DATE,
@@ -25,4 +25,3 @@ CREATE TABLE IF NOT EXISTS error_log_tab (
                 error_message VARCHAR(255),
                 audit_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-*/
