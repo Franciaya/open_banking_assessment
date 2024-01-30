@@ -7,7 +7,7 @@ The workload implemented is a data pipeline using Apache Airflow to process Open
 
 ## Functional Requirement
 
-The following are the requirements:<br>
+**The following are the requirements:** <br>
 1. The pipeline performs several data quality checks on the incoming data to ensure its integrity and validity.<br>
 2. It validates the currency against a predefined list (EUR, GBP, USD) and checks for valid transaction dates in the 'YYYY-MM-DD' format.<br>
 3. Additionally, the pipeline detects and handles duplicate transaction records based on customerId and transactionId.<br>
@@ -60,60 +60,59 @@ The directory structure is organized as follows:
 ## Folder Structure
 The work directory structure is organized as follows:<br>
 
-config/: Contains configuration files used by the data processing scripts.<br>
+**config/:** Contains configuration files used by the data processing scripts.<br>
 
-config.ini: Configuration file specifying database connection details, data processing parameters, and other settings.<br>
-scripts/: Contains Python scripts for data processing and database operations.<br>
-database_operations.py: Script for database operations such as connecting to the database and executing SQL queries.<br>
-data_processing.py: Script for processing banking transaction data, including extraction, validation, transformation, and loading.<br>
-dataProcessing.py: Main script to orchestrate the data processing workflow.<br>
-sql/: Contains SQL files defining database schema and queries.<br>
-upsert_customer_query.sql: SQL file defining the upsert query for customers data.<br>
-upsert_transaction_query.sql: SQL file defining the upsert query for transactions data.<br>
-insert_error_log.sql: SQL file defining the upsert query for customer data.<br>
-tests/: Contains unit tests for the data processing scripts.<br>
-test_data_processing.py: Unit tests for the data processing logic.<br>
-.gitignore: Specifies files and directories to be ignored by Git version control.<br>
-touch.bat: Batch script to execute touch command to make multiple directories at once<br>
-execute_process.bat: Batch script to execute python script to start the data pipeline<br>
-README.md: Project README file providing an overview of the project and usage instructions.<br>
-requirements.txt: Lists Python dependencies required for running the project.<br>
+**config.ini:** Configuration file specifying database connection details, data processing parameters, and other settings.<br>
+**scripts/:** Contains Python scripts for data processing and database operations.<br>
+**databaseOperations.py:** Script for database operations such as connecting to the database and executing SQL queries.<br>
+**dataProcessing.py:** Script for processing banking transaction data, including extraction, validation, transformation, and loading.<br>
+**sql/:** Contains SQL files defining database schema and queries.<br>
+**upsert_customer_query.sql:** SQL file defining the upsert query for customers data.<br>
+**upsert_transaction_query.sql:** SQL file defining the upsert query for transactions data.<br>
+**insert_error_log.sql:** SQL file defining the upsert query for customer data.<br>
+**tests/:** Contains unit tests for the data processing scripts.<br>
+**test_data_processing.py:** Unit tests for the data processing logic.<br>
+**.gitignore:** Specifies files and directories to be ignored by Git version control.<br>
+**touch.bat:** Batch script to execute touch command to make multiple directories at once<br>
+**execute_process.bat:** Batch script to execute python script to start the data pipeline<br>
+**README.md:** Project README file providing an overview of the project and usage instructions.<br>
+**requirements.txt:** Lists Python dependencies required for running the project.<br>
 
 
 # Components
 The task consists of the following components:<br>
 
-Configuration Management: Configuration settings are stored in the config.ini file, allowing easy customization of database connections, data processing parameters, and other settings.<br>
+**Configuration Management:** Configuration settings are stored in the config.ini file, allowing easy customization of database connections, data processing parameters, and other settings.<br>
 
-Data Processing Scripts: Python scripts in the scripts/ directory handle various aspects of data processing, including extraction, validation, transformation, and loading. These scripts are designed to be modular and reusable.<br>
+**Data Processing Scripts:** Python scripts in the scripts/ directory handle various aspects of data processing, including extraction, validation, transformation, and loading. These scripts are designed to be modular and reusable.<br>
 
-SQL Files: SQL files in the sql/ directory define database schema and queries for creating tables and performing data operations. They facilitate the management of database operations and schema changes.<br>
+**SQL Files:** SQL files in the sql/ directory define database schema and queries for creating tables and performing data operations. They facilitate the management of database operations and schema changes.<br>
 
-Unit Tests: Unit tests in the tests/ directory ensure the correctness and reliability of the data processing logic. They help identify and address any issues or bugs in the codebase.<br>
+**Unit Tests:** Unit tests in the tests/ directory ensure the correctness and reliability of the data processing logic. They help identify and address any issues or bugs in the codebase.<br>
 
 # Software Requirements
 The Open Banking Pipeline has the following requirements:<br>
 
-Python 3.x: The project is written in Python and requires Python 3.x to run.<br>
-Apache Airflow: For workflow automation, monitoring, and scheduling of data processing tasks.<br>
-Psycopg2: Python PostgreSQL database adapter for interacting with PostgreSQL databases.<br>
-Boto3: AWS SDK for Python, required for accessing and interacting with AWS services such as S3.<br>
-Other Dependencies: Additional Python packages listed in the requirements.txt file, which can be installed using pip.<br>
+**Python 3.x:** The project is written in Python and requires Python 3.x to run.<br>
+**Apache Airflow:** For workflow automation, monitoring, and scheduling of data processing tasks.<br>
+**Psycopg2:** Python PostgreSQL database adapter for interacting with PostgreSQL databases.<br>
+**Boto3:** AWS SDK for Python, required for accessing and interacting with AWS services such as S3.<br>
+**Other Dependencies:** Additional Python packages listed in the requirements.txt file, which can be installed using pip.<br>
 
 # Installation and Setup:
 To set up and run the Open Banking Pipeline project, follow these steps:<br>
 
-1. Clone the project repository from GitHub:<br>
+1. **Clone the project repository from GitHub:** <br>
    git clone <repository-url><br>
           
 
 
-2. Navigate to the project directory:<br>
+2. **Navigate to the project directory:** <br>
    cd open_banking_pipeline<br>
           
 
 
- 3.Install Python dependencies using pip:<br>
+ 3.**Install Python dependencies using pip:** <br>
    pip install -r requirements.txt<br>
           
 4. Configure the config.ini file in the config/ directory with database connection details, data processing parameters, and other settings as per your requirements.<br>
