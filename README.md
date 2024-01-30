@@ -39,7 +39,7 @@ The directory structure is organized as follows:
               
 
 ## Folder Structure
-The project directory structure is organized as follows:<br>
+The work directory structure is organized as follows:<br>
 
 config/: Contains configuration files used by the data processing scripts.<br>
 
@@ -58,7 +58,7 @@ requirements.txt: Lists Python dependencies required for running the project.<br
 
 
 # Components
-The project consists of the following components:<br>
+The task consists of the following components:<br>
 
 Configuration Management: Configuration settings are stored in the config.ini file, allowing easy customization of database connections, data processing parameters, and other settings.<br>
 
@@ -69,7 +69,7 @@ SQL Files: SQL files in the sql/ directory define database schema and queries fo
 Unit Tests: Unit tests in the tests/ directory ensure the correctness and reliability of the data processing logic. They help identify and address any issues or bugs in the codebase.<br>
 
 # Software Requirements
-The Open Banking Pipeline project has the following requirements:<br>
+The Open Banking Pipeline has the following requirements:<br>
 
 Python 3.x: The project is written in Python and requires Python 3.x to run.<br>
 Apache Airflow: For workflow automation, monitoring, and scheduling of data processing tasks.<br>
