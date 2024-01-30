@@ -23,17 +23,34 @@ The following are the requirements:<br>
 The directory structure is organized as follows:
 
           open_banking_pipeline/
+              |-- clean_dump/
+              |   |--filtered_transactions.json
               |-- config/
               |   |-- config.ini
-              |-- scripts/
-              |   |-- database_operations.py
-              |   |-- data_processing.py
-              |   |-- main.py
+              |--input_data
+              |   |--tech_assessment_transaction.json
+              |-- pipeline/
+              |   |-- _init_.py
+              |   |-- configurationReader.py
+              |   |-- dataProcessing.py
+              |   |-- currencyValidator.py
+              |   |-- dataformatValidator
+              |   |-- jsonDuplicateRemoval
+              |   |-- PostgreSQLCreateSchema
+              |   |-- jsonDuplicateRemoval
+              |   |-- schemaValidator.py
+              |-- airflowDAG
+              |   |--airflowDatapipeline.py
               |-- sql/
-              |   |-- upsert_query.sql
+              |   |-- upsert_customer_query.sql
+              |   |-- upsert_transactions_query.sql
+              |   |-- upsert_error_log.sql
               |-- tests/
               |   |-- test_data_processing.py
               |-- .gitignore
+              |-- dump_files.bat
+              |-- execute_process.bat
+              |-- touch.bat
               |-- README.md
               |-- requirements.txt
               
