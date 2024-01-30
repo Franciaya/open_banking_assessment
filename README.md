@@ -5,7 +5,7 @@ Building a roburst and maintainable data pipeline for processing dummy source da
 ##  Data Pipeline Overview
 The workload implemented is a data pipeline using Apache Airflow to process Open Banking transaction data provided in JSON format. The Open Banking Pipeline project aims to manage data processing tasks related to banking transactions.
 
-## Project Requirement
+## Functional Requirement
 
 The following are the requirements:
 1. The pipeline performs several data quality checks on the incoming data to ensure its integrity and validity.
