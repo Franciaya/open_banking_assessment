@@ -45,6 +45,8 @@ The directory structure is organized as follows:
               |   |-- upsert_customer_query.sql
               |   |-- upsert_transactions_query.sql
               |   |-- upsert_error_log.sql
+              |-- table_schema
+              |   |-- table_schema.sql
               |-- tests/
               |   |-- test_data_processing.py
               |-- .gitignore
@@ -64,12 +66,16 @@ config.ini: Configuration file specifying database connection details, data proc
 scripts/: Contains Python scripts for data processing and database operations.<br>
 database_operations.py: Script for database operations such as connecting to the database and executing SQL queries.<br>
 data_processing.py: Script for processing banking transaction data, including extraction, validation, transformation, and loading.<br>
-main.py: Main script to orchestrate the data processing workflow.<br>
+dataProcessing.py: Main script to orchestrate the data processing workflow.<br>
 sql/: Contains SQL files defining database schema and queries.<br>
-upsert_customer_query.sql: SQL file defining the upsert query for customer data.<br>
+upsert_customer_query.sql: SQL file defining the upsert query for customers data.<br>
+upsert_transaction_query.sql: SQL file defining the upsert query for transactions data.<br>
+insert_error_log.sql: SQL file defining the upsert query for customer data.<br>
 tests/: Contains unit tests for the data processing scripts.<br>
 test_data_processing.py: Unit tests for the data processing logic.<br>
 .gitignore: Specifies files and directories to be ignored by Git version control.<br>
+touch.bat: Batch script to execute touch command to make multiple directories at once<br>
+execute_process.bat: Batch script to execute python script to start the data pipeline<br>
 README.md: Project README file providing an overview of the project and usage instructions.<br>
 requirements.txt: Lists Python dependencies required for running the project.<br>
 
