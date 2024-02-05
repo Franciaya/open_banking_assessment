@@ -1,5 +1,6 @@
 
 import json
+import os
 
 data = {
             "transactions": [
@@ -42,7 +43,9 @@ data = {
             ]
        }
 
-data_test = json.loads(json.dumps(data))
+# data_test = json.loads(json.dumps(data))
 
-for x in data_test['transactions']:
-    print(x)
+# for x in data_test['transactions']:
+#     print(x)
+
+print(f"Current directory: {os.curdir}")

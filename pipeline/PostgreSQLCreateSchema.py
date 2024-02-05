@@ -6,27 +6,23 @@ from configurationReader import ConfigReader
 
 class DBHandler:
 
-    def __init__(self,config_dir:str,config_filename:str,section_name:str):
-        """
-        Initialize the DatabaseManager object with default config file and section.
+    def __init__(self,section_name:str,reader: ConfigReader):
+        
+        #Initialize the DatabaseManager object with default config file and section.
+        #:param config_file: The path to the configuration file.
+        # script_dir = os.path.dirname(os.path.abspath(__file__))
+        # config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
+        #:param section: The section in the configuration file containing database connection details.
 
-        :param config_file: The path to the configuration file.
-        :param section: The section in the configuration file containing database connection details.
-        """
-        self.config_dir = config_dir
-        self.config_filename = config_filename
         self.section_name = section_name
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
-        reader = ConfigReader(config_file_path)
-        self.dbConfig = reader.get_section(self.section_name)
+        self.reader = reader
+        
 
     def readDB_config(self):
-        """
-        Read database connection details from the configuration file.
-
-        :return: A dictionary containing database connection parameters.
-        """
+        #Read database connection details from the configuration file.
+        #:return: A dictionary containing database connection parameters.
+        self.dbConfig = self.reader.get_section(self.section_name)
+        
         if self.dbConfig:
             return self.dbConfig
         else:
@@ -42,10 +38,9 @@ class DBHandler:
             print("Error connecting to the database:", e)
             return None
 
-    def execute_sql_files(self, conn):
-        sql_folder = "table_schema"
-        sql_files = [file for file in os.listdir(sql_folder) if file.endswith('.sql')]
+    def execute_sql_files(self,sql_folder: str, conn):
 
+        sql_files = [file for file in os.listdir(sql_folder) if file.endswith('.sql')]
         if not sql_files:
             print("No SQL files found in the SQL folder")
             return

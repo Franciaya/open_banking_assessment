@@ -7,13 +7,10 @@ import os
 
 class JSONDuplicateRemover:
 
-    def __init__(self,config_dir:str,config_filename:str,section_name:str):
-        self.config_dir = config_dir
-        self.config_filename = config_filename
+    def __init__(self,section_name:str,reader: ConfigReader):
+        #initialize config reader to read duplicate configuration section in the config.ini
         self.section_name = section_name
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
-        reader = ConfigReader(config_file_path)
+        self.reader = reader
         self.section_name_dict = reader.get_section(self.section_name)
 
     def readJSON_config(self):

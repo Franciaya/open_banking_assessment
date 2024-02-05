@@ -81,11 +81,11 @@ class DataProcessing:
                     
 
 
-    def process_data(self, data):
+    def process_data(self,map_key: str, data):
 
         transformed_data = []
         error_data = []
-        transactions = data.get("transactions", [])
+        transactions = data.get(map_key, [])
         for record in transactions:
             try:
                 transformed_record, error_record = self._process_record(record)
@@ -100,7 +100,7 @@ class DataProcessing:
                 })
         trans_data = {
 
-            "transactions":json.loads(json.dumps(transformed_data))
+            map_key:json.loads(json.dumps(transformed_data))
 
         }
         return trans_data, error_data
@@ -239,67 +239,3 @@ class DataProcessing:
             conn.rollback()
 
 
-
-# transformed_data,error_data = None,None
-# processor = DataProcessing('config','config.ini','DATABASE','purge_duplicate')
-# # Process data
-# flag, data = processor.extract('local','json','input_data')
-# print(f"Data returns {flag}")
-# if flag:
-#     transformed_data, error_data = processor.process_data(data)
-# dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
-# print("Count before duplicate removal: ", len(transformed_data['transactions']))
-# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')cls
-# dup.save_json(error_data,'clean_dump','error_bucket.json')
-
-#filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
-#dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
-#print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
-
-#transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions','customer_id')
-#dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
-# print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
-# processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')
-
-
-#df = pd.DataFrame(transformed_data['transactions'])
-# df = pd.DataFrame.from_dict(transformed_data, orient='index')
-
-# null_customer_id = df[df['customer_id'].isnull()]
-# null_transaction_id = df[df['transaction_id'].isnull()]
-
-# # Print records with null values for 'customer_id'
-# print("Records with null 'customer_id':")
-# print(null_customer_id)
-
-# # Print records with null values for 'transaction_id'
-# print("\nRecords with null 'transaction_id':")
-# print(null_transaction_id)
-
-# # Step 4: Remove Null Values
-# #clean_df = df.dropna()
-
-#
-#print("Successful")
-# Load data into tables
-#processor.load_data_into_tables(transformed_data, 'your_table_name')
-
-
-
-# records_with_nulls = []
-# for transaction in transformed_data['transactions']:
-#     try:
-#         print(type(transaction))
-#         if transaction['customer_id'] is None or transaction['transaction_id'] is None:
-#             records_with_nulls.append(transaction)
-
-#     except TypeError as e:
-#         print(f"Error: {e}" )
-
-# # Print records with null values
-# print("Records with null values for 'customer_id' or 'transaction_id':")
-# for record in records_with_nulls:
-#     print(record)
-
-# Convert JSON data to Python dictionary
-#data_dict = json.loads(json_data)
