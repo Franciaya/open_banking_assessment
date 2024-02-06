@@ -3,17 +3,14 @@ import os
 from configurationReader import ConfigReader
 
 class SchemaValidator:
-    def __init__(self):
-        self.config_dir = 'config'
-        self.config_filename = 'config.ini'
-        self.section_name = 'transactions_table_schema'
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
-        reader = ConfigReader(config_file_path)
-        self.schema = reader.get_section(self.section_name)
+    def __init__(self,section_name,reader: ConfigReader):
+
+        self.section_name = section_name
+        self.reader = reader
 
     def readSchema_config(self):
         
+        self.schema = self.reader.get_section(self.section_name)
         if self.schema:
             return self.schema
         else:

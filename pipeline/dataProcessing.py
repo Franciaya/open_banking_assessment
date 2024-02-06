@@ -1,30 +1,34 @@
 import json
 import os
+import boto3
+import pandas as pd
 from datetime import datetime, date
 from psycopg2 import sql
 from currencyValidator import AllowedCurrencyValidator
 from PostgreSQLCreateSchema import DBHandler
 from configurationReader import ConfigReader
 from schemaValidator import SchemaValidator
-import boto3
 from jsonDuplicateRemoval import JSONDuplicateRemover
-import pandas as pd
+from injector import Binder, Injector, inject, Module
+from applicationsModule import DependencyModule
+
 
 class DataProcessing:
+    injector_dependency = Injector([DependencyModule()])
 
-    def __init__(self,config_dir,config_filename,db_section_name,dup_section_name):
-
-        self.config_dir = config_dir
-        self.config_filename = config_filename
-        self.dup_section_name = dup_section_name
+    def __init__(self,config_file_path,db_section_name,duplicate_section,currency_section,schema_section):
+        self.config_file_path = config_file_path
+        self.currency_section = currency_section
+        self.duplicate_section = duplicate_section
         self.db_section_name = db_section_name
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.schema_section = schema_section
         
 
-    def extract(self, file_location, file_type,input_dir):
+    def extract(self,script_dir,input_folder):
 
-        if file_location.lower() == 'local' and file_type == 'json':
-            json_file_path = os.path.join(self.script_dir, '..', input_dir)
+        self.script_dir = script_dir
+        if self.script_dir:
+            json_file_path = os.path.join(self.script_dir, '..', input_folder)
             j_files = os.listdir(json_file_path)
 
             if len(j_files) == 1:
@@ -39,53 +43,56 @@ class DataProcessing:
             else:
                 return False, "Empty or too many files in the directory"
             
-        elif file_location.lower() == 's3' and file_type == 'json':
-            config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
-            reader = ConfigReader(config_file_path)
+        # elif location.lower() == 's3' and file_type == 'json':
+        #     config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
+        #     reader = ConfigReader(config_file_path)
 
-            bucket_name = reader.get_value('S3', 'bucket_name')
-            ws_access_key_id = reader.get_value('AWS', 'aws_access_key_id')
-            aws_secret_access_key = reader.get_value('AWS', 'aws_secret_access_key')
+        #     bucket_name = reader.get_value('S3', 'bucket_name')
+        #     ws_access_key_id = reader.get_value('AWS', 'aws_access_key_id')
+        #     aws_secret_access_key = reader.get_value('AWS', 'aws_secret_access_key')
             
 
-            # Create an S3 client using the AWS credentials
-            s3 = boto3.client(
-                's3',
-                aws_access_key_id=ws_access_key_id,
-                aws_secret_access_key=aws_secret_access_key
-            )
+        #     # Create an S3 client using the AWS credentials
+        #     s3 = boto3.client(
+        #         's3',
+        #         aws_access_key_id=ws_access_key_id,
+        #         aws_secret_access_key=aws_secret_access_key
+        #     )
 
-            # Specify the key (path) of the object you want to retrieve from the bucket
-            obj_key = reader.get_value('S3', 'key')
+        #     # Specify the key (path) of the object you want to retrieve from the bucket
+        #     obj_key = reader.get_value('S3', 'key')
 
-            try:
-                # Retrieve the object from the S3 bucket
-                res = s3.get_object(Bucket=bucket_name, Key=obj_key)
+        #     try:
+        #         # Retrieve the object from the S3 bucket
+        #         res = s3.get_object(Bucket=bucket_name, Key=obj_key)
 
-                # Read the contents of the object
-                data = res['Body'].read().decode('utf-8')
+        #         # Read the contents of the object
+        #         data = res['Body'].read().decode('utf-8')
 
-                # Print the data
-                print("Data loaded from S3:")
-                print(data)
+        #         # Print the data
+        #         print("Data loaded from S3:")
+        #         print(data)
 
-                return True, data
+        #         return True, data
 
-            except Exception as e:
-                print("Error:", e)
+        #     except Exception as e:
+        #         print("Error:", e)
 
-                return False, str(f'Error encountered: {e}')
+        #         return False, str(f'Error encountered: {e}')
                         
         else:   
-            return False, "Invalid location or type"
+            return False, "Invalid location or empy JSON File"
                     
 
 
-    def process_data(self,map_key: str, data):
+    def process_data(self,data,json_root_key: str):
 
+        self.reader = DataProcessing.injector_dependency.\
+        create_object(ConfigReader,config_file_path=self.config_file_path)
         transformed_data = []
         error_data = []
-        transactions = data.get(map_key, [])
+        transactions = data.get(json_root_key, [])
+
         for record in transactions:
             try:
                 transformed_record, error_record = self._process_record(record)
@@ -100,15 +107,16 @@ class DataProcessing:
                 })
         trans_data = {
 
-            map_key:json.loads(json.dumps(transformed_data))
+            json_root_key:json.loads(json.dumps(transformed_data))
 
         }
         return trans_data, error_data
     
 
     def _process_record(self, record):
+        # instance_with_injection = injector.create_object(MyClass, file_path=file_path_value)
 
-        allowedCur = AllowedCurrencyValidator()
+        allowedCur = AllowedCurrencyValidator(self.currency_section,self.reader)
         if not allowedCur.validate(record['currency']):
             return None, {
                 'customer_id': record['customerId'],
@@ -155,7 +163,7 @@ class DataProcessing:
     
     def _check_schema(self, record):
         #Schema checks for data type and structure to ensure DQ"""
-        schema = SchemaValidator()
+        schema = SchemaValidator(self.schema_section,self.reader)
         flag , err_msg = schema.validate(record)
 
         return flag, err_msg
@@ -163,7 +171,7 @@ class DataProcessing:
     def remove_duplicates(self, data,transactions_key, composite_keys, source_date_key):
         
         #Removes duplicates from JSON file based on configuration.
-        rem = JSONDuplicateRemover(self.config_dir, self.config_filename, self.dup_section_name)
+        rem = JSONDuplicateRemover(self.duplicate_section,self.reader)
         config = rem.readJSON_config()
         self.transaction_key = config.get(transactions_key)
         self.composite_keys = config.get(composite_keys).split(',')
@@ -175,12 +183,12 @@ class DataProcessing:
         
         return filtered_data
     
-    def transform_data(self,transactions_data,schema_key,col_key):
+    def transform_data(self,data,root_key,col_key,new_root_key):
 
         # Convert the extracted data to JSON format
         distinct_customers = {}
 
-        for customer in transactions_data[schema_key]:
+        for customer in data[root_key]:
             customer_id = customer[col_key]
             if customer_id not in distinct_customers:
                 distinct_customers[customer_id] = {
@@ -190,7 +198,7 @@ class DataProcessing:
 
         customers_list = list(distinct_customers.values())
         customers_data = {
-                "customers":json.loads(json.dumps(customers_list, indent=4))
+                new_root_key:json.loads(json.dumps(customers_list, indent=4))
         }
 
         return customers_data
@@ -209,12 +217,12 @@ class DataProcessing:
         return data
 
 
-    def load_data_into_tables(self, data,schema,tbl,sql_folder,filename):
+    def load_data_into_tables(self, data,root_key,tbl,sql_folder,filename):
         try:
-            db = DBHandler(self.config_dir, self.config_filename, self.db_section_name)
+            db = DBHandler(self.db_section_name,self.reader)
             conn = db.connect_to_database()
             with conn.cursor() as cursor:
-                for record in data[schema]:   
+                for record in data[root_key]:   
                     columns = list(record.keys())
                     # values = [record[column] for column in columns]
                     values = list(record.values())

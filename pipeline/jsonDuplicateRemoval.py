@@ -1,7 +1,6 @@
 import json
 from collections import defaultdict
 from datetime import datetime
-import configparser
 from configurationReader import ConfigReader
 import os
 
@@ -11,20 +10,19 @@ class JSONDuplicateRemover:
         #initialize config reader to read duplicate configuration section in the config.ini
         self.section_name = section_name
         self.reader = reader
-        self.section_name_dict = reader.get_section(self.section_name)
+        
 
     def readJSON_config(self):
-        """Reads configuration from the .ini file."""
-        # config = configparser.ConfigParser()
-        # config.read(self.config_file)
-        # return config[self.section_name]
+        #Reads configuration from the .ini file.
+
+        self.section_name_dict = self.reader.get_section(self.section_name)
         if self.section_name_dict:
             return self.section_name_dict
         else:
             return {}
 
     def load_json(self, input_file_dir,filename):
-        """Loads JSON data from a file."""
+        #Loads JSON data from a file
         config_file_path = os.path.join(self.script_dir, '..', input_file_dir, filename)
 
         with open(config_file_path, 'r') as file:
@@ -32,7 +30,7 @@ class JSONDuplicateRemover:
         return data
 
     def filter_duplicates(self, data, transaction_key, composite_keys, source_date_key):
-        """Removes duplicates from JSON data based on composite keys."""
+        #Removes duplicates from JSON data based on composite keys
         empty_list = []
         unique_transactions = defaultdict(dict)
 
@@ -54,7 +52,7 @@ class JSONDuplicateRemover:
         return {transaction_key: filtered_transactions}
 
     def save_json(self, data, output_file_dir,filename):
-        """Saves JSON data to a file."""
+        #Saves JSON data to a file
         config_file_path = os.path.join(self.script_dir, '..', output_file_dir, filename)
 
         with open(config_file_path, 'w') as file:
