@@ -47,5 +47,3 @@ data = {
 
 # for x in data_test['transactions']:
 #     print(x)
-
-print(f"Current directory: {os.curdir}")

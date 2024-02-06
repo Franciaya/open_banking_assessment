@@ -1,12 +1,14 @@
 from configparser import ConfigParser
-from injector import inject
+from injector import Binder, Injector, inject, Module
 
 class ConfigReader:
 
     @inject
-    def __init__(self,config_file_path,config:ConfigParser):
-        self.config_file_path = config_file_path
+    def __init__(self,config: ConfigParser):
         self.config = config
+    
+    def setConfig(self,config_file_path: str):
+        self.config_file_path = config_file_path
 
     def readConfig(self):
         self.config.read(self.config_file_path)

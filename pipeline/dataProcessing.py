@@ -14,10 +14,9 @@ from applicationsModule import DependencyModule
 
 
 class DataProcessing:
-    injector_dependency = Injector([DependencyModule()])
 
-    def __init__(self,config_file_path,db_section_name,duplicate_section,currency_section,schema_section):
-        self.config_file_path = config_file_path
+    def __init__(self,config_path,db_section_name,duplicate_section,currency_section,schema_section):
+        self.config_path = config_path
         self.currency_section = currency_section
         self.duplicate_section = duplicate_section
         self.db_section_name = db_section_name
@@ -42,43 +41,6 @@ class DataProcessing:
 
             else:
                 return False, "Empty or too many files in the directory"
-            
-        # elif location.lower() == 's3' and file_type == 'json':
-        #     config_file_path = os.path.join(self.script_dir, '..', self.config_dir, self.config_filename)
-        #     reader = ConfigReader(config_file_path)
-
-        #     bucket_name = reader.get_value('S3', 'bucket_name')
-        #     ws_access_key_id = reader.get_value('AWS', 'aws_access_key_id')
-        #     aws_secret_access_key = reader.get_value('AWS', 'aws_secret_access_key')
-            
-
-        #     # Create an S3 client using the AWS credentials
-        #     s3 = boto3.client(
-        #         's3',
-        #         aws_access_key_id=ws_access_key_id,
-        #         aws_secret_access_key=aws_secret_access_key
-        #     )
-
-        #     # Specify the key (path) of the object you want to retrieve from the bucket
-        #     obj_key = reader.get_value('S3', 'key')
-
-        #     try:
-        #         # Retrieve the object from the S3 bucket
-        #         res = s3.get_object(Bucket=bucket_name, Key=obj_key)
-
-        #         # Read the contents of the object
-        #         data = res['Body'].read().decode('utf-8')
-
-        #         # Print the data
-        #         print("Data loaded from S3:")
-        #         print(data)
-
-        #         return True, data
-
-        #     except Exception as e:
-        #         print("Error:", e)
-
-        #         return False, str(f'Error encountered: {e}')
                         
         else:   
             return False, "Invalid location or empy JSON File"
@@ -86,12 +48,15 @@ class DataProcessing:
 
 
     def process_data(self,data,json_root_key: str):
-
-        self.reader = DataProcessing.injector_dependency.\
-        create_object(ConfigReader,config_file_path=self.config_file_path)
+        injector_dependency = Injector([DependencyModule()])
+        self.reader = injector_dependency.get(ConfigReader)
+        self.reader.setConfig(self.config_path)
+        self.reader.readConfig()
         transformed_data = []
         error_data = []
         transactions = data.get(json_root_key, [])
+        # print(f"Number of record is {len(transactions)}")
+        # return None,None
 
         for record in transactions:
             try:
@@ -117,6 +82,7 @@ class DataProcessing:
         # instance_with_injection = injector.create_object(MyClass, file_path=file_path_value)
 
         allowedCur = AllowedCurrencyValidator(self.currency_section,self.reader)
+        allowedCur.readCurrency()
         if not allowedCur.validate(record['currency']):
             return None, {
                 'customer_id': record['customerId'],
@@ -250,18 +216,22 @@ class DataProcessing:
 #(self,config_file_path,db_section_name,duplicate_section,currency_section,schema_section)
 transformed_data,error_data = None,None
 config_file_path = r"D:\open_banking_assessment\config\config.ini"
+db_schema = 'DATABASE'
+duplicate_section = 'purge_duplicate'
+allowed_currency = 'allowed_currencies'
+table_schema_section = 'transactions_table_schema'
 script_dir = r"D:\open_banking_assessment\pipeline"
-processor = DataProcessing(config_file_path,'DATABASE','purge_duplicate',
-                           'allowed_currencies','transactions_table_schema')
+processor = DataProcessing(config_file_path,db_schema,duplicate_section,
+                           allowed_currency,table_schema_section)
 
 # # Process data
 flag, data = processor.extract(script_dir,'input_data')
 print(flag)
-# print(f"Data returns {flag}")
-# if flag:
-#     transformed_data, error_data = processor.process_data(data)
+print(f"Data returns {len(data['transactions'])}")
+if flag:
+    transformed_data, error_data = processor.process_data(data,'transactions')
 # dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
-# print("Count before duplicate removal: ", len(transformed_data['transactions']))
+print("Count before duplicate removal: ", len(transformed_data['transactions']))
 # dup.save_json(transformed_data,'clean_dump','transact_transformed.json')cls
 # dup.save_json(error_data,'clean_dump','error_bucket.json')
 

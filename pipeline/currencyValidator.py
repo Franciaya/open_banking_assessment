@@ -9,7 +9,7 @@ class AllowedCurrencyValidator:
         self.section_name = section_name
         
     
-    def readCurrency(self):
+    def readCurrency(self) -> None:
         self.allowed_currencies = [i.upper() for i in list(self.reader.get_section(self.section_name))]
 
     def validate(self, currency):
