@@ -1,8 +1,9 @@
 import json
+import os
 from collections import defaultdict
 from datetime import datetime
 from configurationReader import ConfigReader
-import os
+
 
 class JSONDuplicateRemover:
 

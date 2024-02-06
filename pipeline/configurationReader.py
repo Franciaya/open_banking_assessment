@@ -1,5 +1,4 @@
 from configparser import ConfigParser
-import os
 from injector import inject
 
 class ConfigReader:

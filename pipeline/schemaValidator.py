@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 import os
 from configurationReader import ConfigReader
 

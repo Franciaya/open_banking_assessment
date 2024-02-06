@@ -247,3 +247,29 @@ class DataProcessing:
             conn.rollback()
 
 
+#(self,config_file_path,db_section_name,duplicate_section,currency_section,schema_section)
+transformed_data,error_data = None,None
+config_file_path = r"D:\open_banking_assessment\config\config.ini"
+script_dir = r"D:\open_banking_assessment\pipeline"
+processor = DataProcessing(config_file_path,'DATABASE','purge_duplicate',
+                           'allowed_currencies','transactions_table_schema')
+
+# # Process data
+flag, data = processor.extract(script_dir,'input_data')
+print(flag)
+# print(f"Data returns {flag}")
+# if flag:
+#     transformed_data, error_data = processor.process_data(data)
+# dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
+# print("Count before duplicate removal: ", len(transformed_data['transactions']))
+# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')cls
+# dup.save_json(error_data,'clean_dump','error_bucket.json')
+
+#filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
+#dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
+#print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
+
+#transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions','customer_id')
+#dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
+# print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
+# processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')

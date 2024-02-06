@@ -1,6 +1,5 @@
 import os
 import psycopg2
-from configparser import ConfigParser
 from configurationReader import ConfigReader
 
 
@@ -9,10 +8,8 @@ class DBHandler:
     def __init__(self,section_name:str,reader: ConfigReader):
         
         #Initialize the DatabaseManager object with default config file and section.
-        #:param config_file: The path to the configuration file.
         # script_dir = os.path.dirname(os.path.abspath(__file__))
         # config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
-        #:param section: The section in the configuration file containing database connection details.
 
         self.section_name = section_name
         self.reader = reader

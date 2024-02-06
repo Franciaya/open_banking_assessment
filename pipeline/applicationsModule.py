@@ -1,4 +1,4 @@
-from injector import Binder, Injector, inject, Module
+from injector import Binder, inject, Module
 from configparser import ConfigParser
 
 class DependencyModule(Module):
