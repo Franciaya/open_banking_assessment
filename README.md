@@ -39,7 +39,7 @@ The directory structure is organized as follows:
               |   |-- PostgreSQLCreateSchema
               |   |-- jsonDuplicateRemoval
               |   |-- schemaValidator.py
-              |-- airflowDAG
+              |-- dag
               |   |--airflowDatapipeline.py
               |-- sql/
               |   |-- upsert_customer_query.sql
