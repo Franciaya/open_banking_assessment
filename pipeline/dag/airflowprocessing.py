@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from data_processing import DataProcessing
+from airflow.operators.python import PythonOperator
+from dataProcessing import DataProcessing
 
 # Specify the default arguments for the DAG
 default_args = {
