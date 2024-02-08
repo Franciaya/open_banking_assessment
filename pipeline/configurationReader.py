@@ -30,21 +30,3 @@ class ConfigReader:
             return self.config.get(section_name, key)
         else:
             return None
-        
-#Usage:
-# script_dir = os.path.dirname(os.path.abspath(__file__))
-# config_file_path = os.path.join(script_dir, '..', 'config', 'config.ini')
-
-# # Create an instance of ConfigReader
-# config_reader = ConfigReader(config_file_path)
-
-# # Specify the section name
-# section_name = 'DATABASE'
-
-# # Retrieve a specific value from the specified section
-# db_host = config_reader.get_value(section_name, 'host')
-# print("Database Host:", db_host) 
-
-# allowedList = config_reader.get_section('allowed_currencies')
-# print("Allowed currency dictionary: ", {col.upper():v for col,v in allowedList.items()})
-# print("Allowed currency list:", [s.upper() for s in list(allowedList)])

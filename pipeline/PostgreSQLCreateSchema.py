@@ -6,20 +6,14 @@ from configurationReader import ConfigReader
 class DBHandler:
 
     def __init__(self,section_name:str,reader: ConfigReader):
-        
         #Initialize the DatabaseManager object with default config file and section.
-        # script_dir = os.path.dirname(os.path.abspath(__file__))
-        # config_file_path = os.path.join(script_dir, '..', self.config_dir, self.config_filename)
-
         self.section_name = section_name
         self.reader = reader
-        
 
     def readDB_config(self):
         #Read database connection details from the configuration file.
-        #:return: A dictionary containing database connection parameters.
+
         self.dbConfig = self.reader.get_section(self.section_name)
-        
         if self.dbConfig:
             return self.dbConfig
         else:

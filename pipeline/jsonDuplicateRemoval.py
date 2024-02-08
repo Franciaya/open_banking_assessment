@@ -54,7 +54,8 @@ class JSONDuplicateRemover:
 
     def save_json(self, data, output_file_dir,filename):
         #Saves JSON data to a file
-        config_file_path = os.path.join(self.script_dir, '..', output_file_dir, filename)
+        current_dir = os.getcwd()
+        config_file_path = os.path.join(current_dir,output_file_dir, filename)
 
         with open(config_file_path, 'w') as file:
             json.dump(data, file, indent=4)

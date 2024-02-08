@@ -26,24 +26,29 @@ class DataProcessing:
     def extract(self,script_dir,input_folder):
 
         self.script_dir = script_dir
-        if self.script_dir:
-            json_file_path = os.path.join(self.script_dir, '..', input_folder)
-            j_files = os.listdir(json_file_path)
+        try:
+            if self.script_dir:
+                json_file_path = os.path.join(self.script_dir, '..', input_folder)
+                j_files = os.listdir(json_file_path)
 
-            if len(j_files) == 1:
-                j_file = os.path.join(json_file_path, j_files[0])
-                
-                # Open the JSON file and read its contents
-                with open(j_file, 'r') as file:
-                    data = json.load(file)
+                if len(j_files) == 1:
+                    j_file = os.path.join(json_file_path, j_files[0])
+                    
+                    # Open the JSON file and read its contents
+                    with open(j_file, 'r') as file:
+                        data = json.load(file)
 
-                return True, data
+                    return True, data
 
-            else:
-                return False, "Empty or too many files in the directory"
-                        
-        else:   
-            return False, "Invalid location or empy JSON File"
+                else:
+                    return False, "Empty or too many files in the directory"
+                            
+            else:   
+                return False, "Invalid location or empy JSON File"
+            
+        except Exception as e:
+            print(f"Error while reading file: {e}")
+        
                     
 
 
@@ -61,7 +66,8 @@ class DataProcessing:
         for record in transactions:
             try:
                 transformed_record, error_record = self._process_record(record)
-                transformed_data.append(transformed_record)
+                if transformed_record:
+                    transformed_data.append(transformed_record)
                 if error_record:
                     error_data.append(error_record)
             except Exception as e:
@@ -130,6 +136,7 @@ class DataProcessing:
     def _check_schema(self, record):
         #Schema checks for data type and structure to ensure DQ"""
         schema = SchemaValidator(self.schema_section,self.reader)
+        schema.readSchema_config()
         flag , err_msg = schema.validate(record)
 
         return flag, err_msg
@@ -149,7 +156,7 @@ class DataProcessing:
         
         return filtered_data
     
-    def transform_data(self,data,root_key,col_key,new_root_key):
+    def transform_data(self,data,root_key,col_key,new_root_key,*columns):
 
         # Convert the extracted data to JSON format
         distinct_customers = {}
@@ -157,11 +164,11 @@ class DataProcessing:
         for customer in data[root_key]:
             customer_id = customer[col_key]
             if customer_id not in distinct_customers:
-                distinct_customers[customer_id] = {
-                    "customer_id": customer_id,
-                    "transaction_date": customer["transaction_date"]
-                }
-
+                # distinct_customers[customer_id] = {
+                #     "customer_id": customer_id,
+                #     "transaction_date": customer["transaction_date"]
+                # }
+                distinct_customers[customer_id] = {column: customer[column] for column in columns}
         customers_list = list(distinct_customers.values())
         customers_data = {
                 new_root_key:json.loads(json.dumps(customers_list, indent=4))
@@ -182,11 +189,10 @@ class DataProcessing:
 
         return data
 
-
     def load_data_into_tables(self, data,root_key,tbl,sql_folder,filename):
         try:
-            db = DBHandler(self.db_section_name,self.reader)
-            conn = db.connect_to_database()
+            db_handler = DBHandler(self.db_section_name,self.reader)
+            conn = db_handler.connect_to_database()
             with conn.cursor() as cursor:
                 for record in data[root_key]:   
                     columns = list(record.keys())
@@ -213,33 +219,41 @@ class DataProcessing:
             conn.rollback()
 
 
-#(self,config_file_path,db_section_name,duplicate_section,currency_section,schema_section)
-transformed_data,error_data = None,None
-config_file_path = r"D:\open_banking_assessment\config\config.ini"
-db_schema = 'DATABASE'
-duplicate_section = 'purge_duplicate'
-allowed_currency = 'allowed_currencies'
-table_schema_section = 'transactions_table_schema'
-script_dir = r"D:\open_banking_assessment\pipeline"
-processor = DataProcessing(config_file_path,db_schema,duplicate_section,
-                           allowed_currency,table_schema_section)
 
-# # Process data
-flag, data = processor.extract(script_dir,'input_data')
-print(flag)
-print(f"Data returns {len(data['transactions'])}")
-if flag:
-    transformed_data, error_data = processor.process_data(data,'transactions')
-# dup = JSONDuplicateRemover('config','config.ini','purge_duplicate')
-print("Count before duplicate removal: ", len(transformed_data['transactions']))
-# dup.save_json(transformed_data,'clean_dump','transact_transformed.json')cls
-# dup.save_json(error_data,'clean_dump','error_bucket.json')
+if __name__ == "__main__":
 
-#filtered_transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
-#dup.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
-#print("Count after duplicate removal: ", len(filtered_transactions_data['transactions']))
+    transformed_data,error_data = None,None
+    config_file_path = os.path.join(os.getcwd(),'config','config.ini')
+    db_schema = 'DATABASE'
+    duplicate_section = 'purge_duplicate'
+    allowed_currency = 'allowed_currencies'
+    table_schema_section = 'transactions_table_schema'
+    script_dir = os.path.join(os.getcwd(),'pipeline')
 
-#transformed_customers_data = processor.transform_data(filtered_transactions_data,'transactions','customer_id')
-#dup.save_json(transformed_customers_data,'clean_dump','transformed_customers_data.json')
-# print("Count after duplicate removal: ", len(transformed_customers_data['customers']))
-# processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')
+    processor = DataProcessing(config_file_path,db_schema,duplicate_section,
+                            allowed_currency,table_schema_section)
+
+    # # Process data
+    flag, data = processor.extract(script_dir,'input_data')
+    print(f"Data returns {len(data['transactions'])}")
+    if flag:
+        transformed_data, error_data = processor.process_data(data,'transactions')
+
+    injector_dependency = Injector([DependencyModule()])
+    reader = injector_dependency.get(ConfigReader)
+    reader.setConfig(config_file_path)
+    reader.readConfig()
+
+    duplicate_remover = JSONDuplicateRemover(duplicate_section,reader)
+    print("Count before duplicate removal: ", len(transformed_data['transactions']))
+    # duplicate_remover.save_json(transformed_data,'clean_dump','transact_transformed.json')
+    # duplicate_remover.save_json(error_data,'clean_dump','error_bucket.json')
+
+    transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
+    # duplicate_remover.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
+    print("Count after duplicate removal: ", len(transactions_data['transactions']))
+    customer_columns = ("customer_id","transaction_date")
+    customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers',*customer_columns)
+    duplicate_remover.save_json(customers_data,'before_duplicate','transformed_customers_data.json')
+    print("Count after duplicate removal: ", len(customers_data['customers']))
+    # processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')
