@@ -228,7 +228,18 @@ if __name__ == "__main__":
     duplicate_section = 'purge_duplicate'
     allowed_currency = 'allowed_currencies'
     table_schema_section = 'transactions_table_schema'
+    sql_folder = 'table_schema'
     script_dir = os.path.join(os.getcwd(),'pipeline')
+    injector_dependency = Injector([DependencyModule()])
+    reader = injector_dependency.get(ConfigReader)
+    reader.setConfig(config_file_path)
+    reader.readConfig()
+
+    # Connect to PostgreSQL Db and create table schemas
+    db_handler = DBHandler(db_schema,reader)
+    conn = db_handler.connect_to_database()
+    db_handler.execute_sql_files(sql_folder,conn)
+    
 
     processor = DataProcessing(config_file_path,db_schema,duplicate_section,
                             allowed_currency,table_schema_section)
