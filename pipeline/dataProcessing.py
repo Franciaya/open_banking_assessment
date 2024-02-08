@@ -239,12 +239,11 @@ if __name__ == "__main__":
     db_handler = DBHandler(db_schema,reader)
     conn = db_handler.connect_to_database()
     db_handler.execute_sql_files(sql_folder,conn)
-    
+
 
     processor = DataProcessing(config_file_path,db_schema,duplicate_section,
                             allowed_currency,table_schema_section)
-
-    # # Process data
+    # Process data
     flag, data = processor.extract(script_dir,'input_data')
     print(f"Data returns {len(data['transactions'])}")
     if flag:
