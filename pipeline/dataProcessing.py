@@ -1,6 +1,7 @@
 import json
 import os
 import boto3
+import sys
 import pandas as pd
 from datetime import datetime, date
 from psycopg2 import sql
@@ -81,7 +82,13 @@ class DataProcessing:
             json_root_key:json.loads(json.dumps(transformed_data))
 
         }
-        return trans_data, error_data
+        error_log_data = {
+
+            'errors': json.loads(json.dumps(error_data))
+
+        }
+
+        return trans_data, error_log_data
     
 
     def _process_record(self, record):
@@ -225,6 +232,10 @@ if __name__ == "__main__":
     transformed_data,error_data = None,None
     config_file_path = os.path.join(os.getcwd(),'config','config.ini')
     db_schema = 'DATABASE'
+    cust_table_name = 'customers'
+    cust_root_key = 'customers'
+    trans_table_name = 'transactions'
+    trans_root_key = 'transactions'
     duplicate_section = 'purge_duplicate'
     allowed_currency = 'allowed_currencies'
     table_schema_section = 'transactions_table_schema'
@@ -234,36 +245,41 @@ if __name__ == "__main__":
     reader = injector_dependency.get(ConfigReader)
     reader.setConfig(config_file_path)
     reader.readConfig()
+    try:
+        # Connect to PostgreSQL Db and create table schemas
+        db_handler = DBHandler(db_schema,reader)
+        conn = db_handler.connect_to_database()
+        db_handler.execute_sql_files(sql_folder,conn)
 
-    # Connect to PostgreSQL Db and create table schemas
-    db_handler = DBHandler(db_schema,reader)
-    conn = db_handler.connect_to_database()
-    db_handler.execute_sql_files(sql_folder,conn)
+        # Process data
+        processor = DataProcessing(config_file_path,db_schema,duplicate_section,
+                                allowed_currency,table_schema_section)
+        flag, data = processor.extract(script_dir,'input_data')
+        print(f"Data returns {len(data['transactions'])}")
+        if flag:
+            transformed_data, error_data = processor.process_data(data,'transactions')
+
+        injector_dependency = Injector([DependencyModule()])
+        reader = injector_dependency.get(ConfigReader)
+        reader.setConfig(config_file_path)
+        reader.readConfig()
+
+        duplicate_remover = JSONDuplicateRemover(duplicate_section,reader)
+        print("Count before duplicate removal: ", len(transformed_data['transactions']))
+        # duplicate_remover.save_json(transformed_data,'clean_dump','transact_transformed.json')
+        # duplicate_remover.save_json(error_data,'clean_dump','error_bucket.json')
+
+        transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
+        # duplicate_remover.save_json(transactions_data,'clean_dump','filtered_transactions_data.json')
+        print("Count after duplicate removal: ", len(transactions_data['transactions']))
+        customer_columns = ("customer_id","transaction_date")
+        customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers',*customer_columns)
+        duplicate_remover.save_json(customers_data,'before_duplicate','transformed_customers_data.json')
+        print("Count after duplicate removal: ", len(customers_data['customers']))
+        processor.load_data_into_tables(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
+        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_customer_query.sql')
+        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_customer_query.sql')
 
 
-    processor = DataProcessing(config_file_path,db_schema,duplicate_section,
-                            allowed_currency,table_schema_section)
-    # Process data
-    flag, data = processor.extract(script_dir,'input_data')
-    print(f"Data returns {len(data['transactions'])}")
-    if flag:
-        transformed_data, error_data = processor.process_data(data,'transactions')
-
-    injector_dependency = Injector([DependencyModule()])
-    reader = injector_dependency.get(ConfigReader)
-    reader.setConfig(config_file_path)
-    reader.readConfig()
-
-    duplicate_remover = JSONDuplicateRemover(duplicate_section,reader)
-    print("Count before duplicate removal: ", len(transformed_data['transactions']))
-    # duplicate_remover.save_json(transformed_data,'clean_dump','transact_transformed.json')
-    # duplicate_remover.save_json(error_data,'clean_dump','error_bucket.json')
-
-    transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
-    # duplicate_remover.save_json(filtered_transactions_data,'clean_dump','filtered_transactions_data.json')
-    print("Count after duplicate removal: ", len(transactions_data['transactions']))
-    customer_columns = ("customer_id","transaction_date")
-    customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers',*customer_columns)
-    duplicate_remover.save_json(customers_data,'before_duplicate','transformed_customers_data.json')
-    print("Count after duplicate removal: ", len(customers_data['customers']))
-    # processor.load_data_into_tables(transformed_customers_data,'customers','customers','sql','upsert_customer_query.sql')
+    except Exception as e:
+        print(f"Error while trying to process data: {e}")
