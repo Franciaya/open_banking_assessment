@@ -275,7 +275,9 @@ if __name__ == "__main__":
 
         print("Count transactions before duplicate removal: ", len(transformed_data['transactions']))
         duplicate_remover.save_json(transformed_data,'before_duplicate',f'transaction_data_transformed_{timestamp}.json')
-        duplicate_remover.save_json(error_data,'error_dump',f'error_bucket_{timestamp}.json')
+
+        if len(error_data['errors']) > 0: 
+            duplicate_remover.save_json(error_data,'error_dump',f'error_bucket_{timestamp}.json')
 
         transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
         duplicate_remover.save_json(transactions_data,'clean_dump',f'processed_transactions_data_{timestamp}.json')
@@ -285,7 +287,10 @@ if __name__ == "__main__":
         print("Count after duplicate removal: ", len(customers_data['customers']))
         processor.load_data_into_tables(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
         processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_transaction_query.sql')
-        processor.load_data_into_tables(error_data,'errors','error_log_tab','sql','insert_error_log.sql')
+        
+        if len(error_data['errors']) > 0:
+            processor.load_data_into_tables(error_data,'errors','error_log_tab','sql','insert_error_log.sql')
+
         print("successful!")
 
     except Exception as e:
