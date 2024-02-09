@@ -226,7 +226,6 @@ class DataProcessing:
             conn.rollback()
 
 
-
 if __name__ == "__main__":
 
     transformed_data,error_data = None,None
@@ -277,8 +276,8 @@ if __name__ == "__main__":
         duplicate_remover.save_json(customers_data,'before_duplicate','transformed_customers_data.json')
         print("Count after duplicate removal: ", len(customers_data['customers']))
         processor.load_data_into_tables(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
-        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_customer_query.sql')
-        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_customer_query.sql')
+        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_transaction_query.sql')
+        processor.load_data_into_tables(error_data,'errors',trans_table_name,'sql','insert_error_log.sql')
 
 
     except Exception as e:
