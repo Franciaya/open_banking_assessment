@@ -163,7 +163,7 @@ class DataProcessing:
         
         return filtered_data
     
-    def transform_data(self,data,root_key,col_key,new_root_key,*columns):
+    def transform_data(self,data,root_key,col_key,new_root_key,date_key,*columns):
 
         # Convert the extracted data to JSON format
         distinct_customers = {}
@@ -171,11 +171,13 @@ class DataProcessing:
         for customer in data[root_key]:
             customer_id = customer[col_key]
             if customer_id not in distinct_customers:
-                # distinct_customers[customer_id] = {
-                #     "customer_id": customer_id,
-                #     "transaction_date": customer["transaction_date"]
-                # }
                 distinct_customers[customer_id] = {column: customer[column] for column in columns}
+            else:
+                current_date = datetime.fromisoformat(customer[date_key])
+                existing_date = datetime.fromisoformat(distinct_customers[customer_id][date_key])
+                if current_date > existing_date:
+                    distinct_customers[customer_id] = {column: customer[column] for column in columns}
+
         customers_list = list(distinct_customers.values())
         customers_data = {
                 new_root_key:json.loads(json.dumps(customers_list, indent=4))
@@ -240,12 +242,20 @@ if __name__ == "__main__":
     table_schema_section = 'transactions_table_schema'
     sql_folder = 'table_schema'
     script_dir = os.path.join(os.getcwd(),'pipeline')
-    injector_dependency = Injector([DependencyModule()])
-    reader = injector_dependency.get(ConfigReader)
-    reader.setConfig(config_file_path)
-    reader.readConfig()
+    customer_columns = ("customer_id","transaction_date")
+    
+    
     try:
-        # Connect to PostgreSQL Db and create table schemas
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # create depenpendency injection and read the config file
+        injector_dependency = Injector([DependencyModule()])
+        reader = injector_dependency.get(ConfigReader)
+        reader.setConfig(config_file_path)
+        reader.readConfig()
+        duplicate_remover = JSONDuplicateRemover(duplicate_section,reader)
+
+        # Connect to PostgreSQL Db and create tables transactions, customers, and error_log_tab
         db_handler = DBHandler(db_schema,reader)
         conn = db_handler.connect_to_database()
         db_handler.execute_sql_files(sql_folder,conn)
@@ -253,32 +263,30 @@ if __name__ == "__main__":
         # Process data
         processor = DataProcessing(config_file_path,db_schema,duplicate_section,
                                 allowed_currency,table_schema_section)
+        
         flag, data = processor.extract(script_dir,'input_data')
         print(f"Data returns {len(data['transactions'])}")
+
         if flag:
             transformed_data, error_data = processor.process_data(data,'transactions')
+        
+        else:
+            sys.exit()
 
-        injector_dependency = Injector([DependencyModule()])
-        reader = injector_dependency.get(ConfigReader)
-        reader.setConfig(config_file_path)
-        reader.readConfig()
-
-        duplicate_remover = JSONDuplicateRemover(duplicate_section,reader)
-        print("Count before duplicate removal: ", len(transformed_data['transactions']))
-        # duplicate_remover.save_json(transformed_data,'clean_dump','transact_transformed.json')
-        # duplicate_remover.save_json(error_data,'clean_dump','error_bucket.json')
+        print("Count transactions before duplicate removal: ", len(transformed_data['transactions']))
+        duplicate_remover.save_json(transformed_data,'before_duplicate',f'transaction_data_transformed_{timestamp}.json')
+        duplicate_remover.save_json(error_data,'error_dump',f'error_bucket_{timestamp}.json')
 
         transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
-        # duplicate_remover.save_json(transactions_data,'clean_dump','filtered_transactions_data.json')
-        print("Count after duplicate removal: ", len(transactions_data['transactions']))
-        customer_columns = ("customer_id","transaction_date")
-        customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers',*customer_columns)
-        duplicate_remover.save_json(customers_data,'before_duplicate','transformed_customers_data.json')
+        duplicate_remover.save_json(transactions_data,'clean_dump',f'processed_transactions_data_{timestamp}.json')
+        print("Count transactions after duplicate removal: ", len(transactions_data['transactions']))
+        customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers','transaction_date',*customer_columns)
+        duplicate_remover.save_json(customers_data,'clean_dump',f'processed_customers_data_{timestamp}.json')
         print("Count after duplicate removal: ", len(customers_data['customers']))
         processor.load_data_into_tables(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
         processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_transaction_query.sql')
-        processor.load_data_into_tables(error_data,'errors',trans_table_name,'sql','insert_error_log.sql')
-
+        processor.load_data_into_tables(error_data,'errors','error_log_tab','sql','insert_error_log.sql')
+        print("successful!")
 
     except Exception as e:
         print(f"Error while trying to process data: {e}")

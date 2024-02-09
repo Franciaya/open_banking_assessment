@@ -59,19 +59,3 @@ class JSONDuplicateRemover:
 
         with open(config_file_path, 'w') as file:
             json.dump(data, file, indent=4)
-
-
-
-# rem = JSONDuplicateRemover('config', 'config.ini','purge_duplicate')
-# dump_folder = 'clean_dump'
-# config = rem.readJSON_config()
-# transaction_key = config.get('transactions_key')
-# composite_keys = config.get('composite_keys').split(',')
-# source_date_key = config.get('source_date_key')
-
-# data = rem.load_json('input_data','tech_assessment_transactions.json')
-# print("Count before duplicate removal: ",len(data[transaction_key]))
-# filtered_data = rem.filter_duplicates(data, transaction_key, composite_keys, source_date_key)
-# # print("Count after duplicate removal: ",len(filtered_data[transaction_key]))
-# # rem.save_json(filtered_data,dump_folder, 'curated_data.json')
-# # print("Duplicates removed and filtered data saved to: ", dump_folder)

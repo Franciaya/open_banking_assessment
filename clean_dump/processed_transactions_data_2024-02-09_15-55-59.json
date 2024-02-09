@@ -1,0 +1,48 @@
+{
+    "transactions": [
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f898",
+            "transaction_id": "56c304bc-5563-4ec9-b445-fe2a3bf63d65",
+            "transaction_date": "2021-08-02",
+            "source_date": "2021-08-07 02:00:12",
+            "merchant_id": 64,
+            "category_id": 3,
+            "amount": 247.15,
+            "description": "Francis-Love | Shopping",
+            "currency": "GBP"
+        },
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
+            "transaction_id": "894afc55-5f97-4224-95a9-775e4350919f",
+            "transaction_date": "2020-08-16",
+            "source_date": "2020-08-19 21:00:33",
+            "merchant_id": 28,
+            "category_id": 9,
+            "amount": -362.43,
+            "description": "Casey Inc | Health & Beauty",
+            "currency": "GBP"
+        },
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f895",
+            "transaction_id": "8b5f5cf3-f812-4a48-811a-404bcf803a4b",
+            "transaction_date": "2021-06-16",
+            "source_date": "2021-06-22 15:56:08",
+            "merchant_id": 7,
+            "category_id": 11,
+            "amount": 9.25,
+            "description": "Henderson and Sons | General",
+            "currency": "GBP"
+        },
+        {
+            "customer_id": "fbbe0690-0cd1-48eb-aece-f2744db6f899",
+            "transaction_id": "8b5f5cf3-f812-4a48-811a-404bcf803a4b5",
+            "transaction_date": "2021-06-16",
+            "source_date": "2021-06-22 15:56:08",
+            "merchant_id": 10,
+            "category_id": 12,
+            "amount": 1759.25,
+            "description": "Henderson and Sons | General",
+            "currency": "GBP"
+        }
+    ]
+}
