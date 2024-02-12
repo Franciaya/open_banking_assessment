@@ -158,7 +158,6 @@ class DataProcessing:
         self.source_date_key = config.get(source_date_key)
 
         filtered_data = rem.filter_duplicates(data, self.transaction_key, self.composite_keys, self.source_date_key)
-        #print("Count after duplicate removal: ", len(filtered_data[self.transaction_key]))
 
         
         return filtered_data
@@ -185,20 +184,7 @@ class DataProcessing:
 
         return customers_data
     
-    def emptyRecordDump(self,data,key):
-        filtered_transactions = []
-        for transaction in data[key]:
-            try:
-                if 'customer_id' in transaction and 'transaction_id' in transaction:
-                    filtered_transactions.append(transaction)
-            except TypeError as e:
-                print(f"Error: {e}")
-
-        data[key] = filtered_transactions
-
-        return data
-
-    def load_data_into_tables(self, data,root_key,tbl,sql_folder,filename):
+    def load_data(self, data,root_key,tbl,sql_folder,filename):
         try:
             db_handler = DBHandler(self.db_section_name,self.reader)
             conn = db_handler.connect_to_database()
@@ -265,7 +251,6 @@ if __name__ == "__main__":
                                 allowed_currency,table_schema_section)
         
         flag, data = processor.extract(script_dir,'input_data')
-        print(f"Data returns {len(data['transactions'])}")
 
         if flag:
             transformed_data, error_data = processor.process_data(data,'transactions')
@@ -273,7 +258,6 @@ if __name__ == "__main__":
         else:
             sys.exit()
 
-        print("Count transactions before duplicate removal: ", len(transformed_data['transactions']))
         duplicate_remover.save_json(transformed_data,'before_duplicate',f'transaction_data_transformed_{timestamp}.json')
 
         if len(error_data['errors']) > 0: 
@@ -281,12 +265,10 @@ if __name__ == "__main__":
 
         transactions_data = processor.remove_duplicates(transformed_data,'transactions_key','composite_keys','source_date_key')
         duplicate_remover.save_json(transactions_data,'clean_dump',f'processed_transactions_data_{timestamp}.json')
-        print("Count transactions after duplicate removal: ", len(transactions_data['transactions']))
         customers_data = processor.transform_data(transactions_data,'transactions','customer_id','customers','transaction_date',*customer_columns)
         duplicate_remover.save_json(customers_data,'clean_dump',f'processed_customers_data_{timestamp}.json')
-        print("Count after duplicate removal: ", len(customers_data['customers']))
-        processor.load_data_into_tables(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
-        processor.load_data_into_tables(transactions_data,trans_root_key,trans_table_name,'sql','upsert_transaction_query.sql')
+        processor.load_data(customers_data,cust_root_key,cust_table_name,'sql','upsert_customer_query.sql')
+        processor.load_data(transactions_data,trans_root_key,trans_table_name,'sql','upsert_transaction_query.sql')
         
         if len(error_data['errors']) > 0:
             processor.load_data_into_tables(error_data,'errors','error_log_tab','sql','insert_error_log.sql')
