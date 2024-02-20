@@ -1,6 +1,6 @@
 # Open Banking Pipeline
 This documentation provides an overview of the Open Banking Pipeline task, including its structure, components, requirements, and usage instructions.<br><br>
-Building a roburst and maintainable data pipeline for processing dummy source data in JSON format, which simulates Open Banking transaction data, is the focus of this work. The workload involves<br> conducting a few Data Quality checks on the incoming data before transforming and inserting it into two PostgreSQL tables.The project emphasizes modularity, extensibility, and automation to streamline the data processing workflow.<br><br>
+Building a roburst and maintainable data pipeline for processing dummy source data in JSON format, which simulates Open Banking transaction data, is the focus of this work. The workload involves conducting a few Data Quality checks on the incoming data before transforming and inserting it into two PostgreSQL tables.The project emphasizes modularity, extensibility, and automation to streamline the data processing workflow.<br><br>
 
 ##  Data Pipeline Overview
 The workload implemented is a data pipeline using Apache Airflow to process Open Banking transaction data provided in JSON format. The Open Banking Pipeline project aims to manage data processing tasks related to banking transactions.<br>
